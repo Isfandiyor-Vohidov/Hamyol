@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+  <title>Hamyol — путешествия по Узбекистану</title>
+  <meta name="description" content="Hamyol: все города Узбекистана, отели, базары, достопримечательности, карта, отзывы и калькулятор бюджета поездки.">
+  <meta name="theme-color" content="#0b1f3a">
+  <!-- use-credentials: манифест запрашивается с cookie (нужно за туннелями вроде ngrok) -->
+  <link rel="manifest" href="manifest.webmanifest" crossorigin="use-credentials">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="icon" href="icons/icon-192.png" type="image/png" sizes="192x192">
+  <!-- iPhone и iPad: иконка на экране «Домой» только PNG, полноэкранный режим, тёмная строка состояния -->
+  <!-- Иконка встроена прямо в страницу: iPhone скачивает её отдельным запросом без cookie, и туннели
+       (ngrok) отдают вместо картинки свою страницу-предупреждение. Файл icons/apple-touch-icon.png — для остальных. -->
+  <link rel="apple-touch-icon" sizes="180x180" href="data:image/png;base64,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">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Hamyol">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;800&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.Default.min.css">
+  <link rel="stylesheet" href="css/style.css">
+  <script>
+    // Тема до отрисовки, чтобы не было вспышки
+    try { const th = localStorage.getItem("safar_theme"); if (th) document.documentElement.dataset.theme = th; } catch {}
+    // Крупный текст — тоже до отрисовки
+    try { if (localStorage.getItem("safar_big") === "1") document.documentElement.classList.add("big"); } catch {}
+    // Размер текста, шрифт и прочие настройки «Aa» (js/display.js)
+    try {
+      const d = JSON.parse(localStorage.getItem("safar_display") || "null"), r = document.documentElement;
+      r.classList.add("fs-text");   // растут только буквы, а не вся страница (css: --fz)
+      if (d) {
+        r.style.setProperty("--uz", (d.size || 100) / 100);
+        r.classList.toggle("big", d.size >= 115);
+        if (d.font) r.dataset.font = d.font;
+        if (d.bold) r.classList.add("bold-text");
+        if (d.spacing) r.classList.add("airy");
+        if (d.calm) r.classList.add("calm");
+      } else if (r.classList.contains("big")) r.style.setProperty("--uz", 1.15);
+    } catch {}
+    // SEO-адреса /city/<id> и /place/<id> → маршрут приложения #city/<id> (язык из ?lang=)
+    (() => {
+      const m = location.pathname.match(/^\/(city|place)\/([\w-]+)\/?$/);
+      const lang = new URLSearchParams(location.search).get("lang");
+      try { if (lang && ["uz", "ru", "en"].includes(lang)) localStorage.setItem("safar_lang", lang); } catch {}
+      if (m) history.replaceState(null, "", "/#" + m[1] + "/" + m[2]);
+    })();
+    // Сохранённое направление открывается сразу; сменить направление можно из аккаунта.
+    // Первый вход (направление ещё не выбрано) — сразу приложение «Азербайджан» (/az).
+    // Прямые ссылки на узбекский раздел (#city/…, ?start=…, Telegram) открываются здесь, как раньше.
+    try {
+      const raw = localStorage.getItem("safar_region"), region = raw && raw.replace(/"/g, "");
+      const deep = (location.hash && !/^#(home)?$/.test(location.hash)) || location.search || /tgWebApp/.test(location.hash);
+      if (["/", "/index.html"].includes(location.pathname)) {
+        if (!deep && region === "mecca") location.replace("/mecca");
+        else if (!deep && region !== "uz") location.replace("/az");
+      }
+    } catch {}
+    // Telegram Mini App: скрипт Telegram нужен только внутри Telegram
+    if (/tgWebApp/.test(location.hash + location.search)) document.write('<script src="https://telegram.org/js/telegram-web-app.js"><\/script>');
+  </script>
+  <script>
+    (() => {
+      const wa = window.Telegram && window.Telegram.WebApp;
+      const inTg = wa && wa.initData;
+      if (inTg) {
+        document.documentElement.dataset.theme = wa.colorScheme === "light" ? "light" : "dark";
+        document.documentElement.classList.add("in-telegram");
+      }
+      // Ссылки из бота: ?start=city_samarkand или параметр startapp Mini App → #city/samarkand
+      const start = (inTg && wa.initDataUnsafe && wa.initDataUnsafe.start_param) || new URLSearchParams(location.search).get("start");
+      if (start && /^(city|place|collection|trip|guide|account|tickets)_[\w-]+$/.test(start)) history.replaceState(null, "", "/#" + start.replace("_", "/"));
+      else if (start && /^(trains|safety|prices|offline|budget|map|favs|account|tickets)$/.test(start)) history.replaceState(null, "", "/#" + start);
+      else if (inTg && /tgWebApp/.test(location.hash)) history.replaceState(null, "", location.pathname + "#home");
+    })();
+  </script>
+</head>
+<body>
+
+  <!-- ===== Заставка ===== -->
+  <div id="splash" aria-hidden="true">
+    <div class="sp-stars"></div>
+    <div class="sp-glow"></div>
+    <div class="sp-pattern"></div>
+    <svg id="spMap" viewBox="-150 -100 1300 861"></svg>
+    <div class="sp-brand">
+      <h1 class="sp-logo" aria-label="Hamyol"><span><b style="--i:0">H</b></span><span><b style="--i:1">A</b></span><span><b style="--i:2">M</b></span><span><b style="--i:3">Y</b></span><span><b style="--i:4">O</b></span><span><b style="--i:5">L</b></span></h1>
+      <p class="sp-tag"></p>
+      <p class="sp-dest"></p>
+    </div>
+  </div>
+  <script src="js/splash.js"></script>
+  <script src="js/icons.js"></script>
+
+  <!-- ===== Приложение ===== -->
+  <div id="app" class="hidden">
+    <header class="topbar">
+      <a class="brand" href="#home"><span class="brand-mark"><svg class="i i-girih" aria-hidden="true"><use href="#i-girih"/></svg></span><span class="brand-word">HAMYOL</span></a>
+      <nav class="tabs" id="tabs">
+        <a href="#home" data-tab="home" data-i18n="nav_home">Главная</a>
+        <a href="#cities" data-tab="cities" data-i18n="nav_cities">Города</a>
+        <a href="#hotels" data-tab="hotels" data-i18n="nav_hotels">Отели</a>
+        <a href="#places" data-tab="places" data-i18n="nav_places">Места</a>
+        <a href="#map" data-tab="map" data-i18n="nav_map">Карта</a>
+        <a href="#budget" data-tab="budget" data-i18n="nav_budget">Бюджет</a>
+      </nav>
+      <div class="tools">
+        <select id="langSelect" class="pill-select" aria-label="Language"></select>
+        <select id="currency" class="pill-select" aria-label="Currency"></select>
+        <a href="#sos" class="sos-top" aria-label="SOS"><svg class="i i-siren" aria-hidden="true"><use href="#i-siren"/></svg>SOS</a>
+        <button id="bigBtn" class="icon-btn" data-i18n-title="big_text" aria-pressed="false"><svg class="i i-text-size" aria-hidden="true"><use href="#i-text-size"/></svg></button>
+        <button id="themeBtn" class="icon-btn" data-i18n-title="theme_toggle"><svg class="i i-moon" aria-hidden="true"><use href="#i-moon"/></svg></button>
+        <button id="favBtn" class="icon-btn fav-btn" data-i18n-title="favorites"><svg class="i i-heart" aria-hidden="true"><use href="#i-heart"/></svg><b id="favCount"></b></button>
+        <button id="accountBtn" class="icon-btn acc-btn hidden" data-i18n-title="acc_title"><svg class="i i-user" aria-hidden="true"><use href="#i-user"/></svg></button>
+      </div>
+    </header>
+
+    <main>
+      <button class="back-btn back-bar hidden" id="tabBack" data-back type="button"></button>
+      <!-- Главная -->
+      <section id="tab-home" class="tab">
+        <div class="hero" id="hero">
+          <div class="hero-inner">
+            <h1 data-i18n="hero_title">Куда едем?</h1>
+            <p data-i18n="hero_sub"></p>
+            <div class="search-wrap">
+              <svg class="i i-search search-ico" aria-hidden="true"><use href="#i-search"/></svg>
+              <input id="globalSearch" type="search" autocomplete="off" data-i18n-ph="search_ph">
+              <div id="searchResults" class="search-results hidden"></div>
+            </div>
+          </div>
+        </div>
+        <div class="stats" id="stats"></div>
+
+
+        <section class="block">
+          <div class="block-head"><h2><svg class="i i-star" aria-hidden="true"><use href="#i-star"/></svg><span data-i18n="popular"></span></h2><a href="#cities" data-i18n="see_all"></a></div>
+          <div class="grid" id="popularGrid"></div>
+        </section>
+
+        <section class="block">
+          <div class="block-head"><h2><svg class="i i-route" aria-hidden="true"><use href="#i-route"/></svg><span data-i18n="collections"></span></h2></div>
+          <div class="grid collections" id="collectionsGrid"></div>
+        </section>
+
+        <section class="block">
+          <div class="block-head"><h2><svg class="i i-book" aria-hidden="true"><use href="#i-book"/></svg><span data-i18n="guide"></span></h2></div>
+          <div class="guide-tiles" id="guideTiles"></div>
+        </section>
+
+
+
+        <details class="home-more block" id="homeMore">
+          <summary><svg class="i i-w-partly" aria-hidden="true"><use href="#i-w-partly"/></svg><span class="hm-t"></span></summary>
+          <section class="block">
+            <div class="block-head"><h2><svg class="i i-w-partly" aria-hidden="true"><use href="#i-w-partly"/></svg><span data-i18n="weather_now"></span></h2></div>
+            <div class="weather-strip" id="weatherStrip"></div>
+          </section>
+          <div class="two-col">
+            <section class="block panel">
+              <div class="block-head"><h2><svg class="i i-exchange" aria-hidden="true"><use href="#i-exchange"/></svg><span data-i18n="rates_title"></span></h2></div>
+              <div id="ratesBox" class="rates-box"></div>
+              <p class="hint" id="ratesSrc"></p>
+            </section>
+            <section class="block panel">
+              <div class="block-head"><h2><svg class="i i-coins" aria-hidden="true"><use href="#i-coins"/></svg><span data-i18n="converter"></span></h2></div>
+              <div class="converter">
+                <input id="convAmount" type="number" min="0" value="100" inputmode="decimal">
+                <select id="convFrom"></select>
+                <span class="conv-eq">=</span>
+                <div id="convResult" class="conv-result"></div>
+              </div>
+            </section>
+          </div>
+          <section class="block">
+            <div class="block-head"><h2><svg class="i i-map" aria-hidden="true"><use href="#i-map"/></svg><span data-i18n="regions"></span></h2></div>
+            <div class="chips" id="regionChips"></div>
+          </section>
+        </details>
+
+        <footer class="footer">
+          <p data-i18n="data_src"></p>
+          <p id="dataUpdated"></p>
+          <button id="installBtn" class="btn hidden"><svg class="i i-download" aria-hidden="true"><use href="#i-download"/></svg><span data-i18n="install"></span></button>
+        </footer>
+      </section>
+
+      <!-- Города -->
+      <section id="tab-cities" class="tab">
+        <div class="filters">
+          <input id="citySearch" type="search" data-i18n-ph="search_ph">
+          <select id="regionFilter"></select>
+          <select id="cityType">
+            <option value="" data-i18n="type_all"></option>
+            <option value="city" data-i18n="type_city"></option>
+            <option value="town" data-i18n="type_town"></option>
+          </select>
+          <select id="citySort">
+            <option value="pop" data-i18n="sort_pop"></option>
+            <option value="name" data-i18n="sort_name"></option>
+            <option value="rating" data-i18n="sort_rating"></option>
+            <option value="dist" data-i18n="sort_dist"></option>
+          </select>
+          <button class="btn ghost near-btn" data-near="citySort"><svg class="i i-locate" aria-hidden="true"><use href="#i-locate"/></svg><span data-i18n="near_me"></span></button>
+        </div>
+        <p class="hint count" id="cityFound"></p>
+        <div id="cityGrid" class="grid"></div>
+      </section>
+
+      <!-- Отели -->
+      <section id="tab-hotels" class="tab">
+        <div class="filters">
+          <input id="hotelSearch" type="search" data-i18n-ph="search_ph">
+          <select id="hotelCity"></select>
+          <select id="hotelType"></select>
+          <select id="hotelStars"></select>
+          <select id="hotelSort">
+            <option value="stars" data-i18n="sort_stars"></option>
+            <option value="price" data-i18n="sort_price_asc"></option>
+            <option value="-price" data-i18n="sort_price_desc"></option>
+            <option value="rating" data-i18n="sort_rating"></option>
+            <option value="dist" data-i18n="sort_dist"></option>
+          </select>
+          <button class="btn ghost near-btn" data-near="hotelSort"><svg class="i i-locate" aria-hidden="true"><use href="#i-locate"/></svg><span data-i18n="near_me"></span></button>
+        </div>
+        <p class="hint count"><span id="hotelFound"></span> · <span data-i18n="price_note"></span></p>
+        <div id="hotelList" class="list"></div>
+      </section>
+
+      <!-- Места -->
+      <section id="tab-places" class="tab">
+        <div class="seg" id="placeCat">
+          <button data-cat="a" class="active"><svg class="i i-dome" aria-hidden="true"><use href="#i-dome"/></svg><span data-i18n="cat_a"></span></button>
+          <button data-cat="s"><svg class="i i-shopping" aria-hidden="true"><use href="#i-shopping"/></svg><span data-i18n="cat_s"></span></button>
+          <button data-cat="f"><svg class="i i-food" aria-hidden="true"><use href="#i-food"/></svg><span data-i18n="cat_f"></span></button>
+        </div>
+        <div class="filters">
+          <input id="placeSearch" type="search" data-i18n-ph="search_ph">
+          <select id="placeCity"></select>
+          <select id="placeType"></select>
+          <select id="placeSort">
+            <option value="info" data-i18n="sort_info"></option>
+            <option value="rating" data-i18n="sort_rating"></option>
+            <option value="name" data-i18n="sort_name"></option>
+            <option value="dist" data-i18n="sort_dist"></option>
+          </select>
+          <select id="placeCuisine" class="hidden"></select>
+          <label class="btn ghost toggle"><input type="checkbox" id="placeOpen"><span class="dot-open"></span><span data-i18n="only_open"></span></label>
+          <button class="btn ghost near-btn" data-near="placeSort"><svg class="i i-locate" aria-hidden="true"><use href="#i-locate"/></svg><span data-i18n="near_me"></span></button>
+        </div>
+        <div class="chips food-flags hidden" id="foodFlags"></div>
+        <p class="hint count" id="placeFound"></p>
+        <div id="placeList" class="list"></div>
+      </section>
+
+      <!-- Карта -->
+      <section id="tab-map" class="tab">
+        <div class="map-controls" id="mapLayers"></div>
+        <div id="bigMap"></div>
+      </section>
+
+      <!-- Бюджет -->
+      <section id="tab-budget" class="tab">
+        <div class="budget">
+          <div class="panel">
+            <h3><svg class="i i-route" aria-hidden="true"><use href="#i-route"/></svg><span data-i18n="route_title"></span></h3>
+            <p class="hint" data-i18n="route_hint"></p>
+            <div class="route-add">
+              <input id="routeCity" list="cityList" data-i18n-ph="city_ph" autocomplete="off">
+              <datalist id="cityList"></datalist>
+              <input id="routeNights" type="number" min="0" value="2" aria-label="nights">
+              <button id="routeAddBtn" class="btn" data-i18n="add"></button>
+            </div>
+            <label class="trip-date"><svg class="i i-calendar" aria-hidden="true"><use href="#i-calendar"/></svg><span data-i18n="trip_start"></span> <input type="date" id="tripStart"></label>
+            <ol id="routeList" class="route-list"></ol>
+            <div id="routeMap"></div>
+
+            <h3><svg class="i i-filter" aria-hidden="true"><use href="#i-filter"/></svg><span data-i18n="params"></span></h3>
+            <div class="form-grid">
+              <label><span data-i18n="travelers"></span><input id="bPeople" type="number" min="1" value="2"></label>
+              <label><span data-i18n="rooms"></span><input id="bRooms" type="number" min="1" value="1"></label>
+              <label><span data-i18n="hotel_class"></span>
+                <select id="bHotel"><option value="2">2 ★</option><option value="3" selected>3 ★</option><option value="4">4 ★</option><option value="5">5 ★</option></select>
+              </label>
+              <label><span data-i18n="food"></span>
+                <select id="bFood">
+                  <option value="budget" data-i18n="food_budget"></option>
+                  <option value="mid" data-i18n="food_mid" selected></option>
+                  <option value="premium" data-i18n="food_premium"></option>
+                </select>
+              </label>
+              <label><span data-i18n="transport"></span><select id="bTransport"></select></label>
+              <label><span data-i18n="shopping_pp"></span><input id="bShopping" type="number" min="0" value="100"></label>
+            </div>
+
+            <details class="rates">
+              <summary><svg class="i i-edit" aria-hidden="true"><use href="#i-edit"/></svg><span data-i18n="rates_edit"></span></summary>
+              <div id="tariffEditor" class="form-grid"></div>
+              <button id="resetTariffs" class="btn ghost"><svg class="i i-reset" aria-hidden="true"><use href="#i-reset"/></svg><span data-i18n="reset"></span></button>
+            </details>
+          </div>
+
+          <div class="panel result">
+            <h3><svg class="i i-wallet" aria-hidden="true"><use href="#i-wallet"/></svg><span data-i18n="total"></span></h3>
+            <div id="budgetTotal" class="total"></div>
+            <div id="budgetBar" class="bar"></div>
+            <ul id="budgetBreakdown" class="breakdown"></ul>
+            <button id="copyBudget" class="btn ghost"><svg class="i i-copy" aria-hidden="true"><use href="#i-copy"/></svg><span data-i18n="copy"></span></button>
+            <p class="hint" data-i18n="budget_note"></p>
+          </div>
+        </div>
+        <section class="panel trip-days">
+          <div class="block-head"><h2><svg class="i i-calendar-range" aria-hidden="true"><use href="#i-calendar-range"/></svg><span data-i18n="trip_days"></span></h2>
+            <div class="trip-actions">
+              <button class="btn ghost" id="tripIcs"><svg class="i i-calendar-plus" aria-hidden="true"><use href="#i-calendar-plus"/></svg><span data-i18n="trip_ics"></span></button>
+              <button class="btn ghost" id="tripPrint"><svg class="i i-print" aria-hidden="true"><use href="#i-print"/></svg><span data-i18n="trip_print"></span></button>
+              <button class="btn gold-btn" id="tripShare"><svg class="i i-share" aria-hidden="true"><use href="#i-share"/></svg><span data-i18n="share"></span></button>
+            </div>
+          </div>
+          <div id="tripDays"></div>
+        </section>
+      </section>
+    </main>
+
+    <!-- Нижняя навигация (телефон) -->
+    <nav class="bottom-nav" id="bottomNav">
+      <a href="#home" data-tab="home"><svg class="i i-home" aria-hidden="true"><use href="#i-home"/></svg><span data-i18n="nav_home"></span></a>
+      <a href="#cities" data-tab="cities"><svg class="i i-city" aria-hidden="true"><use href="#i-city"/></svg><span data-i18n="nav_cities"></span></a>
+      <a href="#hotels" data-tab="hotels"><svg class="i i-hotel" aria-hidden="true"><use href="#i-hotel"/></svg><span data-i18n="nav_hotels"></span></a>
+      <a href="#sos" class="nav-sos" aria-label="SOS"><b class="nav-sos-dot"><svg class="i i-siren" aria-hidden="true"><use href="#i-siren"/></svg></b><span>SOS</span></a>
+      <a href="#places" data-tab="places"><svg class="i i-dome" aria-hidden="true"><use href="#i-dome"/></svg><span data-i18n="nav_places"></span></a>
+      <a href="#map" data-tab="map"><svg class="i i-map" aria-hidden="true"><use href="#i-map"/></svg><span data-i18n="nav_map"></span></a>
+      <a href="#budget" data-tab="budget"><svg class="i i-wallet" aria-hidden="true"><use href="#i-wallet"/></svg><span data-i18n="nav_budget"></span></a>
+    </nav>
+  </div>
+
+  <!-- Модальное окно -->
+  <div id="modal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-box">
+      <button class="back-btn m-back" id="modalBack" data-back type="button"></button>
+      <button class="close" id="modalClose" aria-label="Close"><svg class="i i-x" aria-hidden="true"><use href="#i-x"/></svg></button>
+      <div id="modalBody"></div>
+    </div>
+  </div>
+  <div id="toast" class="toast"></div>
+  <button id="aiFab" class="ai-fab hidden"><svg class="i i-sparkles" aria-hidden="true"><use href="#i-sparkles"/></svg><span data-i18n="ai_title">AI</span></button>
+
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/leaflet.markercluster.min.js"></script>
+  <script defer src="data/cities.js"></script>
+  <script defer src="data/pois.js"></script>
+  <script defer src="js/i18n.js"></script>
+  <script defer src="js/i18n-extra.js"></script>
+  <script defer src="js/content.js"></script>
+  <script defer src="js/api.js"></script>
+  <script defer src="js/picker.js"></script>
+  <script defer src="js/app.js"></script>
+  <script defer src="js/services.js"></script>
+  <script defer src="js/climate.js"></script>
+  <script defer src="js/planner.js"></script>
+  <script defer src="js/account.js"></script>
+  <script defer src="js/ai.js"></script>
+  <script defer src="js/market.js"></script>
+  <script defer src="js/business.js"></script>
+  <script defer src="js/prices-data.js"></script>
+  <script defer src="js/citypick.js"></script>
+  <script defer src="js/prices.js"></script>
+  <script defer src="js/map-prices.js"></script>
+  <script defer src="js/offline.js"></script>
+  <script defer src="js/push.js"></script>
+  <script defer src="js/nav.js"></script>
+  <script defer src="js/legal-data.js"></script>
+  <script defer src="js/legal.js"></script>
+  <script defer src="js/onboarding.js"></script>
+  <script defer src="js/consent.js"></script>
+  <script defer src="js/quicktrip.js"></script>
+  <script defer src="js/swipe.js"></script>
+  <script defer src="js/network.js"></script>
+  <script defer src="js/autosave.js"></script>
+  <script defer src="js/split.js"></script>
+  <script defer src="js/travelinfo.js"></script>
+  <script defer src="js/display.js"></script>
+  <script defer src="js/recent.js"></script>
+  <script defer src="js/packing.js"></script>
+  <script defer src="js/report.js"></script>
+  <script defer src="js/taxicard.js"></script>
+  <script defer src="js/tipcalc.js"></script>
+  <script defer src="js/partners.js"></script>
+  <script defer src="js/poster.js"></script>
+  <script defer src="js/holidays.js"></script>
+  <script defer src="js/passport.js"></script>
+  <script defer src="js/diary.js"></script>
+  <script defer src="js/tickets.js"></script>
+  <script defer src="js/docs.js"></script>
+  <script defer src="js/sos.js"></script>
+  <script defer src="js/translate-data.js"></script>
+  <script defer src="js/translate.js"></script>
+  <script defer src="js/region-switch.js"></script>
+  <script defer src="js/triplayout.js"></script>
+  <script defer src="js/mapfit.js"></script>
+  <script defer src="js/homelayout.js"></script>
+  <script defer src="js/print.js"></script>
+  <script defer src="js/feedback.js"></script>
+  <script defer src="js/quickfilters.js"></script>
+  <script defer src="js/qa.js"></script>
+  <script defer src="js/crowd.js"></script>
+  <script defer src="js/together.js"></script>
+  <script defer src="js/survey.js"></script>
+  <script defer src="js/stats.js"></script>
+  <script defer src="js/sharelist.js"></script>
+  <script defer src="js/wordofday.js"></script>
+  <script defer src="js/motion.js"></script>
+</body>
+</html>

@@ -1,0 +1,52 @@
+// Готовые фразы для паломника (Мекка, Медина) — работают без интернета.
+// Фраза: [раздел, узбекский, русский, английский, китайский, арабский, транскрипция].
+// Арабский — простой литературный: понимают и саудовцы, и приезжие. Проверено обратным переводом; перед массовым запуском стоит показать носителю.
+const TR_PHRASE_GROUPS = {
+  basic: ["Asosiy", "Основное", "Basics", "基本"],
+  lost: ["Adashdim / mehmonxona", "Потерялся / отель", "Lost / hotel", "迷路 / 酒店"],
+  road: ["Transport", "Транспорт", "Transport", "交通"],
+  health: ["Salomatlik", "Здоровье", "Health", "健康"],
+  shop: ["Xarid va ovqat", "Покупки и еда", "Shopping & food", "购物和饮食"],
+  mosque: ["Masjidda", "В мечети", "At the mosque", "在清真寺"]
+};
+const TR_PHRASES = [
+  ["basic", "Assalomu alaykum", "Здравствуйте", "Hello", "您好", "السلام عليكم", "as-salāmu ʿalaykum"],
+  ["basic", "Rahmat", "Спасибо", "Thank you", "谢谢", "شكراً", "shukran"],
+  ["basic", "Ha / Yo‘q", "Да / Нет", "Yes / No", "是 / 不是", "نعم / لا", "naʿam / lā"],
+  ["basic", "Kechirasiz, mumkinmi?", "Извините, можно вас?", "Excuse me, please", "打扰一下", "لو سمحت", "law samaḥt"],
+  ["basic", "Men arabcha gapirmayman", "Я не говорю по-арабски", "I don't speak Arabic", "我不会说阿拉伯语", "لا أتكلم العربية", "lā atakallam al-ʿarabiyya"],
+  ["basic", "Iltimos, sekinroq gapiring", "Говорите медленнее, пожалуйста", "Please speak slowly", "请说慢一点", "تكلم ببطء من فضلك", "takallam bi-buṭʾ min faḍlik"],
+  ["basic", "Iltimos, yozib bering", "Напишите мне, пожалуйста", "Please write it for me", "请写给我", "اكتبها لي من فضلك", "uktubhā lī min faḍlik"],
+  ["basic", "Hojatxona qayerda?", "Где туалет?", "Where is the toilet?", "厕所在哪里？", "أين دورة المياه؟", "ayna dawrat al-miyāh?"],
+  ["lost", "Men adashib qoldim", "Я потерялся", "I am lost", "我迷路了", "أنا تائه", "anā tāʾih"],
+  ["lost", "Iltimos, menga yordam bering", "Помогите мне, пожалуйста", "Please help me", "请帮帮我", "ساعدني من فضلك", "sāʿidnī min faḍlik"],
+  ["lost", "Men O‘zbekistondanman", "Я из Узбекистана", "I am from Uzbekistan", "我来自乌兹别克斯坦", "أنا من أوزبكستان", "anā min Uzbakistān"],
+  ["lost", "Mehmonxonam qayerda?", "Где мой отель?", "Where is my hotel?", "我的酒店在哪里？", "أين فندقي؟", "ayna funduqī?"],
+  ["lost", "Meni shu mehmonxonaga olib boring", "Отвезите меня в этот отель", "Take me to this hotel", "请带我去这家酒店", "خذني إلى هذا الفندق", "khudhnī ilā hādhā al-funduq"],
+  ["lost", "Guruhim rahbariga qo‘ng‘iroq qiling", "Позвоните руководителю моей группы", "Please call my group leader", "请给我的领队打电话", "اتصل بمسؤول مجموعتي من فضلك", "ittaṣil bi-masʾūl majmūʿatī min faḍlik"],
+  ["lost", "… raqamli darvoza qayerda?", "Где ворота номер …?", "Where is gate number …?", "…号门在哪里？", "أين الباب رقم …؟", "ayna al-bāb raqm …?"],
+  ["lost", "Chiqish qayerda?", "Где выход?", "Where is the exit?", "出口在哪里？", "أين المخرج؟", "ayna al-makhraj?"],
+  ["lost", "Masjidul Harom qayerda?", "Где Масджид аль-Харам?", "Where is Masjid al-Haram?", "禁寺在哪里？", "أين المسجد الحرام؟", "ayna al-masjid al-ḥarām?"],
+  ["road", "… gacha qancha turadi?", "Сколько стоит до …?", "How much to …?", "到…多少钱？", "كم الأجرة إلى …؟", "kam al-ujra ilā …?"],
+  ["road", "Shu yerda to‘xtang", "Остановите здесь", "Stop here, please", "请在这里停", "توقف هنا من فضلك", "tawaqqaf hunā min faḍlik"],
+  ["road", "… ga avtobus qayerda?", "Где автобус до …?", "Where is the bus to …?", "去…的公交车在哪里？", "أين الحافلة إلى …؟", "ayna al-ḥāfila ilā …?"],
+  ["road", "Aeroportga", "В аэропорт", "To the airport", "去机场", "إلى المطار", "ilā al-maṭār"],
+  ["health", "Menga shifokor kerak", "Мне нужен врач", "I need a doctor", "我需要医生", "أحتاج إلى طبيب", "aḥtāj ilā ṭabīb"],
+  ["health", "Tez yordam chaqiring!", "Вызовите скорую!", "Call an ambulance!", "请叫救护车！", "اطلبوا الإسعاف!", "uṭlubū al-isʿāf!"],
+  ["health", "O‘zimni yomon his qilyapman", "Мне плохо", "I feel unwell", "我身体不舒服", "أنا لست بخير", "anā lastu bi-khayr"],
+  ["health", "Menda qandli diabet bor", "У меня диабет", "I have diabetes", "我有糖尿病", "عندي مرض السكري", "ʿindī maraḍ as-sukkarī"],
+  ["health", "Menda … ga allergiya bor", "У меня аллергия на …", "I am allergic to …", "我对…过敏", "عندي حساسية من …", "ʿindī ḥassāsiyya min …"],
+  ["health", "Dorixona qayerda?", "Где аптека?", "Where is a pharmacy?", "药店在哪里？", "أين الصيدلية؟", "ayna aṣ-ṣaydaliyya?"],
+  ["health", "Kasalxona qayerda?", "Где больница?", "Where is the hospital?", "医院在哪里？", "أين المستشفى؟", "ayna al-mustashfā?"],
+  ["health", "Menga suv kerak", "Мне нужна вода", "I need water", "我需要水", "أحتاج إلى ماء", "aḥtāj ilā māʾ"],
+  ["shop", "Bu qancha turadi?", "Сколько это стоит?", "How much is this?", "这个多少钱？", "بكم هذا؟", "bikam hādhā?"],
+  ["shop", "Arzonroq bo‘ladimi?", "Можно дешевле?", "Can it be cheaper?", "可以便宜一点吗？", "ممكن أرخص؟", "mumkin arkhaṣ?"],
+  ["shop", "Iltimos, suv bering", "Воду, пожалуйста", "Water, please", "请给我水", "ماء من فضلك", "māʾ min faḍlik"],
+  ["shop", "Achchiq bo‘lmasin", "Без острого", "Not spicy, please", "请不要辣", "بدون فلفل حار من فضلك", "bidūn filfil ḥārr min faḍlik"],
+  ["shop", "Hisobni bering", "Счёт, пожалуйста", "The bill, please", "请结账", "الحساب من فضلك", "al-ḥisāb min faḍlik"],
+  ["mosque", "Tahorat joyi qayerda?", "Где место для омовения?", "Where can I make wudu?", "在哪里可以做小净？", "أين مكان الوضوء؟", "ayna makān al-wuḍūʾ?"],
+  ["mosque", "Ayollar joyi qayerda?", "Где место для женщин?", "Where is the women's area?", "女士礼拜区在哪里？", "أين مصلى النساء؟", "ayna muṣallā an-nisāʾ?"],
+  ["mosque", "Zamzam suvi qayerda?", "Где вода Замзам?", "Where is the Zamzam water?", "渗渗泉水在哪里？", "أين ماء زمزم؟", "ayna māʾ zamzam?"],
+  ["mosque", "Oyoq kiyimni qayerga qo‘yay?", "Куда положить обувь?", "Where do I leave my shoes?", "鞋子放在哪里？", "أين أضع الحذاء؟", "ayna aḍaʿ al-ḥidhāʾ?"],
+  ["mosque", "Namoz qachon?", "Когда намаз?", "When is the prayer?", "什么时候礼拜？", "متى الصلاة؟", "matā aṣ-ṣalāh?"]
+];

@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="ru" data-app="mecca">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+  <title>Hamyol — Мекка и Медина</title>
+  <meta name="description" content="Hamyol для паломников: Мекка и Медина — святыни, отели, кафе, карта, переводчик на арабский, время намаза, SOS и «Я потерялся». Главное работает без интернета.">
+  <meta name="theme-color" content="#0a3a2e">
+  <link rel="manifest" href="manifest.webmanifest" crossorigin="use-credentials">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Hamyol">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;800&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.Default.min.css">
+  <!-- Общий стиль Safar (только читается) + свой стиль Мекки поверх -->
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/mecca.css">
+  <script>
+    // Тема и размер текста — до отрисовки (те же настройки, что в узбекском приложении)
+    try { const th = localStorage.getItem("safar_theme"); if (th) document.documentElement.dataset.theme = th; } catch {}
+    try {
+      const d = JSON.parse(localStorage.getItem("safar_display") || "null"), r = document.documentElement;
+      if (d) { r.style.setProperty("--uz", (d.size || 100) / 100); r.classList.toggle("big", d.size >= 115); if (d.font) r.dataset.font = d.font; if (d.bold) r.classList.add("bold-text"); }
+    } catch {}
+  </script>
+</head>
+<body>
+  <div id="app" class="mk-app">
+    <header class="topbar mk-topbar">
+      <a class="brand" href="#home"><span class="brand-mark mk-mark">🕋</span><span class="brand-word">HAMYOL</span><span class="mk-brand-sub" data-i18n="mka_title"></span></a>
+      <nav class="tabs" id="tabs">
+        <a href="#home" data-tab="home" data-i18n="mka_nav_home"></a>
+        <a href="#holy" data-tab="holy" data-i18n="mka_nav_holy"></a>
+        <a href="#hotels" data-tab="hotels" data-i18n="mka_nav_hotels"></a>
+        <a href="#food" data-tab="food" data-i18n="mka_nav_food"></a>
+        <a href="#map" data-tab="map" data-i18n="mka_nav_map"></a>
+        <a href="#trip" data-tab="trip" data-i18n="mka_nav_trip"></a>
+      </nav>
+      <div class="tools">
+        <select id="langSelect" class="pill-select" aria-label="Language"></select>
+        <a href="#sos" class="sos-top" aria-label="SOS"><svg class="i i-siren" aria-hidden="true"><use href="#i-siren"/></svg>SOS</a>
+        <button id="themeBtn" class="icon-btn" type="button" aria-label="Theme"><svg class="i i-moon" aria-hidden="true"><use href="#i-moon"/></svg></button>
+        <button id="mkAccBtn" class="icon-btn" type="button" data-i18n-title="mka_account"><svg class="i i-user" aria-hidden="true"><use href="#i-user"/></svg></button>
+      </div>
+    </header>
+
+    <main>
+      <!-- Главная -->
+      <section id="tab-home" class="tab">
+        <div class="hero mk-hero" id="mkHero">
+          <div class="hero-inner">
+            <h1 data-i18n="mka_title"></h1>
+            <p data-i18n="mka_hero_sub"></p>
+            <div class="search-wrap">
+              <svg class="i i-search search-ico" aria-hidden="true"><use href="#i-search"/></svg>
+              <input id="mkSearch" type="search" autocomplete="off" data-i18n-ph="mka_search_ph">
+              <div id="mkResults" class="search-results hidden"></div>
+            </div>
+            <div class="hero-cta">
+              <a class="btn gold-btn" href="#translate"><svg class="i i-languages" aria-hidden="true"><use href="#i-languages"/></svg><span data-i18n="tr_title"></span></a>
+              <a class="btn hero-ghost" href="#map"><svg class="i i-map" aria-hidden="true"><use href="#i-map"/></svg><span data-i18n="mka_nav_map"></span></a>
+            </div>
+            <p class="hero-facts" id="mkFacts"></p>
+          </div>
+        </div>
+        <section class="block" id="mkPrayerBox"></section>
+        <section class="block">
+          <div class="block-head"><h2><svg class="i i-compass" aria-hidden="true"><use href="#i-compass"/></svg><span data-i18n="mka_tools"></span></h2></div>
+          <div class="mk-tools" id="mkTools"></div>
+        </section>
+        <section class="block">
+          <div class="block-head"><h2><svg class="i i-minaret" aria-hidden="true"><use href="#i-minaret"/></svg><span data-i18n="mka_main_holy"></span></h2><a href="#holy" data-i18n="see_all"></a></div>
+          <div class="mk-strip" id="mkHolyStrip"></div>
+        </section>
+        <section class="block">
+          <div class="block-head"><h2><svg class="i i-city" aria-hidden="true"><use href="#i-city"/></svg><span data-i18n="mka_cities"></span></h2></div>
+          <div class="mk-strip" id="mkCityStrip"></div>
+        </section>
+        <p class="hint mk-src" data-i18n="mka_data_src"></p>
+      </section>
+
+      <!-- Святыни -->
+      <section id="tab-holy" class="tab">
+        <div class="mk-head"><h2><svg class="i i-minaret" aria-hidden="true"><use href="#i-minaret"/></svg><span data-i18n="mka_nav_holy"></span></h2></div>
+        <div class="mk-filters">
+          <input id="holyQ" type="search" data-i18n-ph="mka_search_ph" autocomplete="off">
+          <select id="holyCity"></select>
+        </div>
+        <div class="chips" id="holyKinds"></div>
+        <p class="hint" id="holyFound"></p>
+        <div class="list" id="holyList"></div>
+      </section>
+
+      <!-- Отели -->
+      <section id="tab-hotels" class="tab">
+        <div class="mk-head"><h2><svg class="i i-hotel" aria-hidden="true"><use href="#i-hotel"/></svg><span data-i18n="mka_nav_hotels"></span></h2></div>
+        <div class="mk-filters">
+          <input id="hotelQ" type="search" data-i18n-ph="mka_search_ph" autocomplete="off">
+          <select id="hotelCity"></select>
+          <select id="hotelSort"></select>
+        </div>
+        <p class="hint" id="hotelFound"></p>
+        <div class="list" id="hotelList"></div>
+      </section>
+
+      <!-- Еда и рынки -->
+      <section id="tab-food" class="tab">
+        <div class="mk-head"><h2><svg class="i i-food" aria-hidden="true"><use href="#i-food"/></svg><span data-i18n="mka_nav_food"></span></h2></div>
+        <div class="mk-filters">
+          <input id="foodQ" type="search" data-i18n-ph="mka_search_ph" autocomplete="off">
+          <select id="foodCity"></select>
+        </div>
+        <div class="chips" id="foodKinds"></div>
+        <p class="hint" id="foodFound"></p>
+        <div class="list" id="foodList"></div>
+      </section>
+
+      <!-- Карта -->
+      <section id="tab-map" class="tab">
+        <div class="chips mk-map-layers" id="mapLayers"></div>
+        <div id="mkMap" class="mk-map"></div>
+      </section>
+
+      <!-- Поездка -->
+      <section id="tab-trip" class="tab">
+        <div class="mk-head"><h2><svg class="i i-route" aria-hidden="true"><use href="#i-route"/></svg><span data-i18n="mka_nav_trip"></span></h2></div>
+        <p class="hint" data-i18n="mka_trip_hint"></p>
+        <div class="mk-trip-layout">
+          <section class="panel">
+            <h3 data-i18n="mka_trip_stops"></h3>
+            <label class="trip-date mk-trip-date"><span data-i18n="mka_trip_date"></span><input id="mkTripStart" type="date"></label>
+            <div id="mkTripStops"></div>
+            <a class="btn ghost" href="#holy"><span data-i18n="mka_trip_add"></span></a>
+            <div class="sos-links"><a id="mkTripRoute" class="btn gold-btn" target="_blank" rel="noopener" data-i18n="mka_trip_route"></a></div>
+          </section>
+          <section class="panel">
+            <h3 data-i18n="mka_trip_budget"></h3>
+            <div class="form-grid mk-trip-fields">
+              <label><span data-i18n="mka_trip_days"></span><input id="mkTripDays" type="number" min="1" max="60" step="1"></label>
+              <label><span data-i18n="mka_trip_people"></span><input id="mkTripPeople" type="number" min="1" max="30" step="1"></label>
+              <label><span data-i18n="mka_trip_rooms"></span><input id="mkTripRooms" type="number" min="1" max="15" step="1"></label>
+              <label><span data-i18n="mka_trip_hotel"></span><input id="mkTripHotel" type="number" min="0" step="50" inputmode="decimal"></label>
+              <label><span data-i18n="mka_trip_food"></span><input id="mkTripFood" type="number" min="0" step="10" inputmode="decimal"></label>
+              <label><span data-i18n="mka_trip_transport"></span><input id="mkTripTransport" type="number" min="0" step="10" inputmode="decimal"></label>
+              <label><span data-i18n="mka_trip_extra"></span><input id="mkTripExtra" type="number" min="0" step="50" inputmode="decimal"></label>
+            </div>
+            <p class="hint" data-i18n="mka_trip_estimate_note"></p>
+            <div id="mkTripTotal" class="mk-trip-total" aria-live="polite"></div>
+          </section>
+        </div>
+      </section>
+    </main>
+
+    <!-- Нижнее меню (телефон): SOS — посередине, как в узбекском приложении -->
+    <nav class="bottom-nav mk-bottom" id="bottomNav">
+      <a href="#home" data-tab="home"><svg class="i i-home" aria-hidden="true"><use href="#i-home"/></svg><span data-i18n="mka_nav_home"></span></a>
+      <a href="#holy" data-tab="holy"><svg class="i i-minaret" aria-hidden="true"><use href="#i-minaret"/></svg><span data-i18n="mka_nav_holy"></span></a>
+      <a href="#hotels" data-tab="hotels"><svg class="i i-hotel" aria-hidden="true"><use href="#i-hotel"/></svg><span data-i18n="mka_nav_hotels"></span></a>
+      <a href="#sos" class="nav-sos" aria-label="SOS"><b class="nav-sos-dot"><svg class="i i-siren" aria-hidden="true"><use href="#i-siren"/></svg></b><span>SOS</span></a>
+      <a href="#food" data-tab="food"><svg class="i i-food" aria-hidden="true"><use href="#i-food"/></svg><span data-i18n="mka_nav_food"></span></a>
+      <a href="#map" data-tab="map"><svg class="i i-map" aria-hidden="true"><use href="#i-map"/></svg><span data-i18n="mka_nav_map"></span></a>
+      <a href="#trip" data-tab="trip"><svg class="i i-route" aria-hidden="true"><use href="#i-route"/></svg><span data-i18n="mka_nav_trip"></span></a>
+      <a href="#mecca" data-tab="help"><svg class="i i-hand-helping" aria-hidden="true"><use href="#i-hand-helping"/></svg><span data-i18n="mka_nav_help"></span></a>
+    </nav>
+  </div>
+
+  <div id="modal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-box">
+      <button class="close" id="modalClose" aria-label="Close"><svg class="i i-x" aria-hidden="true"><use href="#i-x"/></svg></button>
+      <div id="modalBody"></div>
+    </div>
+  </div>
+  <div id="toast" class="toast"></div>
+
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/leaflet.markercluster.min.js"></script>
+  <script defer src="data/mk-cities.js"></script>
+  <script defer src="data/mk-pois.js"></script>
+  <script defer src="js/icons.js"></script>
+  <script defer src="js/i18n.js"></script>
+  <script defer src="js/i18n-extra.js"></script>
+  <script defer src="js/mk-i18n.js"></script>
+  <script defer src="js/mk-core.js"></script>
+  <!-- Общие готовые блоки Safar — подключены без изменений -->
+  <script defer src="js/consent.js"></script>
+  <script defer src="js/region-switch.js"></script>
+  <script defer src="js/translate-data.js"></script>
+  <script defer src="js/translate.js"></script>
+  <script defer src="js/docs.js"></script>
+  <script defer src="js/sos.js"></script>
+  <script defer src="js/mecca.js"></script>
+  <script defer src="js/mk-app.js"></script>
+</body>
+</html>

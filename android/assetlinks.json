@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "uz.safar.app",
+        "sha256_cert_fingerprints": ["61:B8:B2:82:D6:21:B5:89:98:3F:BB:96:D8:04:38:F0:36:31:CD:0D:71:86:B0:99:78:91:BB:35:EF:4E:D4:37"]
+      }
+    }]

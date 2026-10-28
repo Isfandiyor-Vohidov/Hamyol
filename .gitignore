@@ -1,0 +1,21 @@
+storage/
+scripts/.cache/
+node_modules/
+.env
+# Android: ключ подписи и сборка (APK раздаёт сервер, ключ хранить отдельно и не терять)
+android/*.keystore
+android/twa/
+android/signing.json
+android/*.idsig
+android/gradle-info.log
+
+# Локальное: настройки Claude Code и APK, собранный под конкретный адрес
+.claude/
+android/safar.apk
+
+# Тестовые файлы (пример билета для «Мои билеты»)
+samples/
+test-storage/
+
+# Кэш сборщиков данных (scripts/fetch-az-transit.mjs и др.)
+.cache/

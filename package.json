@@ -1,0 +1,21 @@
+{
+  "name": "safar",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Safar — путешествия по Узбекистану",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "data": "node scripts/fetch-data.mjs",
+    "android": "node scripts/build-android.mjs"
+  },
+  "engines": {
+    "node": ">=22.13"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.134.0"
+  },
+  "devDependencies": {
+    "@bubblewrap/core": "^1.24.1"
+  }
+}

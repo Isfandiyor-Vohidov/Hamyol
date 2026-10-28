@@ -1,0 +1,348 @@
+/* ===================== Hamyol · Азербайджан =====================
+   Подключается ПОСЛЕ общего css/style.css: цвета, шрифт, шапка, карточки, нижнее меню — как в узбекском приложении.
+   Здесь — только то, что нужно Азербайджану: крупные понятные плитки и экраны для взрослых и пожилых.
+   Размер текста — переменная --az-size (rem-размеры ниже) и --uz (размеры общего стиля). */
+:root { --az-size: 1; }
+html { font-size: calc(17px * var(--az-size)); }
+[hidden] { display: none !important; }
+.az-app main { max-width: 980px; padding-bottom: calc(110px + env(safe-area-inset-bottom)); outline: none; }
+
+/* ---------- Шапка: флаг вместо узора ---------- */
+.az-flag { width: 30px; height: 20px; border-radius: 4px; flex: none; background: linear-gradient(#00b5e2 0 33.3%, #ef3340 33.3% 66.6%, #509e2f 66.6%); box-shadow: 0 0 0 1px rgba(255, 255, 255, .55); }
+.brand .az-flag { margin-right: 2px; }
+.az-sub { font-size: 12px; font-weight: 700; color: var(--gold-2); letter-spacing: .04em; margin-left: 6px; }
+.az-lang { min-width: 44px; font-weight: 800; }
+.az-badge { position: absolute; top: -5px; right: -5px; min-width: 20px; height: 20px; padding: 0 5px; border-radius: 10px; background: var(--terra); color: #fff; font-size: 11px; font-weight: 800; display: grid; place-items: center; }
+.icon-btn { position: relative; }
+
+/* ---------- Главная: фото Баку и большие плитки ---------- */
+.az-hero { background-color: var(--lapis); background-size: cover; background-position: center 35%; }
+.az-hero .hero-inner h1 { font-size: clamp(30px, 6vw, 52px); }
+.az-hero-ctas { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
+.az-tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+@media (max-width: 760px) { .az-tiles { grid-template-columns: 1fr 1fr; } }
+.az-tile {
+  position: relative; display: grid; align-content: center; justify-items: center; gap: 6px; min-height: 8.6rem; padding: 14px 10px;
+  border-radius: var(--radius); background: var(--card); border: 1px solid var(--line); box-shadow: var(--shadow);
+  color: var(--text); text-decoration: none; text-align: center; font-weight: 800; font-size: 1.05rem;
+  transition: transform .15s var(--ease), box-shadow .15s;
+}
+.az-tile:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+.az-tile i { width: 3.2rem; height: 3.2rem; border-radius: 16px; display: grid; place-items: center; color: #fff; background: var(--g-c); font-style: normal; }
+.az-tile i .i { width: 1.7rem; height: 1.7rem; }
+.az-tile small { font-weight: 600; font-size: .78rem; color: var(--muted); line-height: 1.3; }
+.az-tile.t-trips i { background: var(--g-a); } .az-tile.t-bus i { background: var(--g-h); } .az-tile.t-pay i { background: var(--g-u); }
+.az-tile.t-tr i { background: var(--g-s); } .az-tile.t-chat i { background: var(--g-c); } .az-tile.t-sos i { background: var(--g-f); }
+.az-tile.t-sos { border-color: rgba(200, 85, 61, .45); }
+.az-tile .az-badge { top: 10px; right: 10px; }
+
+/* Погода и курс маната */
+.az-rates { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; }
+.az-rate { background: var(--card); border: 1px solid var(--line); border-radius: var(--rad); padding: 12px 14px; }
+.az-rate small { display: block; color: var(--muted); font-weight: 700; }
+.az-rate b { font-size: 1.25rem; font-variant-numeric: tabular-nums; }
+
+/* ---------- Экраны: «Назад» и заголовок ---------- */
+.az-back {
+  display: inline-flex; align-items: center; gap: 8px; min-height: 48px; padding: 0 16px 0 10px; margin: 6px 0 10px;
+  border: 1px solid var(--line); border-radius: 14px; background: var(--card); color: var(--text); font-weight: 700; cursor: pointer; box-shadow: var(--shadow);
+}
+.az-back .i { width: 1.4em; height: 1.4em; }
+.az-h1 { font-size: 1.6rem; line-height: 1.2; margin: 4px 0 6px; display: flex; align-items: center; gap: 10px; }
+.az-h1 .i { color: var(--gold-ink); width: 1.3em; height: 1.3em; }
+.az-lead { color: var(--muted); margin: 0 0 16px; }
+h2.az-h2 { font-size: 1.2rem; margin: 22px 0 10px; display: flex; align-items: center; gap: 8px; }
+h2.az-h2 .i { color: var(--gold-ink); }
+
+/* Страница города и места: большое фото сверху */
+.az-cover { position: relative; min-height: 220px; border-radius: var(--r-lg); overflow: hidden; background: var(--g-c); background-position: center; background-size: cover; display: flex; align-items: flex-end; margin-bottom: 14px; box-shadow: var(--shadow); }
+.az-cover::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 35%, rgba(5, 12, 24, .82)); }
+.az-cover > div { position: relative; z-index: 1; padding: 18px; color: #fff; }
+.az-cover h1 { margin: 0; font-size: clamp(26px, 6vw, 40px); line-height: 1.1; }
+.az-cover p { margin: 4px 0 0; opacity: .92; font-weight: 600; }
+.az-cover .tag { display: inline-block; margin-bottom: 8px; }
+.az-story { line-height: 1.6; }
+.az-story p { margin: 0 0 10px; }
+
+/* ---------- Карточки и строки (крупно) ---------- */
+.az-card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; box-shadow: var(--shadow); margin-bottom: 12px; }
+.az-row {
+  display: flex; align-items: center; gap: 14px; width: 100%; min-height: 4.2rem; padding: 14px 16px; margin-bottom: 10px; font: inherit;
+  background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); color: var(--text); text-decoration: none; text-align: left; cursor: pointer; box-shadow: var(--shadow);
+}
+.az-row > .i { width: 2rem; height: 2rem; color: var(--gold-ink); }
+.az-row > div { flex: 1; min-width: 0; }
+.az-row b { display: block; font-size: 1.05rem; }
+.az-row small { display: block; color: var(--muted); font-size: .85rem; }
+.az-row .go { width: 1.4rem; height: 1.4rem; color: var(--muted); }
+.az-facts { display: flex; flex-wrap: wrap; gap: 8px 16px; margin: 4px 0; font-weight: 700; }
+.az-facts span { display: inline-flex; align-items: center; gap: 6px; }
+.az-facts .i { color: var(--gold-ink); }
+.az-list { margin: 8px 0 0; padding-left: 1.3em; }
+.az-list li { margin: 4px 0; }
+.az-note { display: flex; gap: 10px; align-items: flex-start; padding: 12px 14px; border-radius: 14px; background: var(--tint-gold); color: var(--text); margin: 12px 0; font-size: .9rem; }
+.az-note .i { color: var(--gold-ink); margin-top: 2px; flex: none; }
+.az-filters { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 220px); gap: 10px; margin-bottom: 10px; }
+@media (max-width: 560px) { .az-filters { grid-template-columns: 1fr; } }
+.az-filters input, .az-filters select { min-height: 52px; font-size: 1rem; }
+.az-found { color: var(--muted); font-weight: 600; margin: 4px 0 10px; }
+.az-trip-card .card-img { height: 150px; }
+
+/* ---------- Кнопки (в стиле узбекского приложения) ---------- */
+.az-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 54px; padding: 0 20px; font: inherit;
+  border-radius: 16px; border: 1px solid transparent; background: var(--g-gold); color: var(--lapis); font-weight: 800; font-size: 1rem;
+  text-decoration: none; cursor: pointer; text-align: center; box-shadow: var(--shadow);
+}
+.az-btn.ghost { background: var(--card); color: var(--text); border-color: var(--line); }
+.az-btn.red { background: var(--terra); color: #fff; }
+.az-btn.wide { width: 100%; }
+.az-btn:disabled { opacity: .5; cursor: default; }
+.az-btns { display: grid; gap: 10px; margin-top: 14px; }
+.az-btns.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.az-btns .az-btn { min-width: 0; padding: 8px 12px; line-height: 1.2; }
+
+/* ---------- Таблица автобусов ---------- */
+.az-table { width: 100%; border-collapse: collapse; background: var(--card); border-radius: var(--radius); overflow: hidden; border: 1px solid var(--line); box-shadow: var(--shadow); }
+.az-table th, .az-table td { padding: 12px 10px; text-align: left; border-bottom: 1px solid var(--line); vertical-align: top; }
+.az-table th { background: var(--tint-turq); color: var(--tint-turq-ink); font-size: .85rem; }
+.az-table tr:last-child td { border-bottom: 0; }
+
+/* ---------- «Как платить»: шаги ---------- */
+.az-steps { list-style: none; padding: 0; margin: 0; counter-reset: s; }
+.az-steps li { counter-increment: s; display: grid; grid-template-columns: 3rem 1fr; gap: 12px; padding: 14px; margin-bottom: 10px; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); }
+.az-steps li::before { content: counter(s); width: 3rem; height: 3rem; border-radius: 50%; background: var(--g-gold); color: var(--lapis); font-weight: 800; font-size: 1.3rem; display: grid; place-items: center; }
+.az-steps b { display: block; font-size: 1.05rem; }
+.az-steps p { margin: 4px 0 0; color: var(--muted); }
+.az-price { display: flex; align-items: center; gap: 12px; padding: 16px; border-radius: var(--radius); background: var(--tint-green); margin-bottom: 14px; }
+.az-price b { font-size: 2rem; color: var(--green-ink); line-height: 1; white-space: nowrap; }
+
+/* ---------- Переводчик ---------- */
+.az-langs { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: 8px; align-items: center; margin-bottom: 10px; }
+.az-select, .az-input, .az-textarea {
+  width: 100%; min-height: 54px; padding: 12px 14px; border-radius: 14px; border: 1px solid var(--line); background: var(--field); color: var(--field-ink); font: inherit; min-width: 0;
+}
+.az-textarea { min-height: 7rem; resize: vertical; font-size: 1.1rem; }
+.az-swap { width: 54px; height: 54px; border-radius: 14px; border: 1px solid var(--line); background: var(--card); color: var(--text); cursor: pointer; }
+.az-result { margin-top: 12px; padding: 16px; border-radius: var(--radius); background: var(--tint-turq); }
+.az-result p { margin: 0 0 10px; font-size: 1.5rem; font-weight: 800; line-height: 1.35; color: var(--text); }
+.az-result small { color: var(--muted); }
+.az-result .az-btns { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.az-phrase { display: grid; gap: 2px; width: 100%; text-align: left; padding: 12px 14px; margin-bottom: 8px; border-radius: 14px; border: 1px solid var(--line); background: var(--card); color: var(--text); cursor: pointer; font: inherit; }
+.az-phrase b { font-size: 1.1rem; }
+.az-phrase span { color: var(--muted); }
+.az-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+.az-chips button { min-height: 46px; padding: 0 14px; border-radius: 24px; border: 1px solid var(--line); background: var(--card); color: var(--text); font: inherit; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+.az-chips button.on { border-color: var(--gold); background: var(--tint-gold); color: var(--tint-gold-ink); }
+.az-big { position: fixed; inset: 0; z-index: 2000; background: #fffdf6; color: #111; display: grid; place-items: center; padding: 24px; text-align: center; cursor: pointer; }
+.az-big p { font-size: clamp(2rem, 9vw, 3.5rem); font-weight: 800; line-height: 1.25; margin: 0; }
+.az-big small { position: absolute; bottom: calc(20px + env(safe-area-inset-bottom)); left: 0; right: 0; color: #555; font-size: 1rem; }
+
+/* ---------- Чат ---------- */
+.az-chat { display: flex; flex-direction: column; min-height: calc(100vh - 260px); min-height: calc(100dvh - 260px); }
+.az-msgs { flex: 1; display: flex; flex-direction: column; gap: 8px; padding: 8px 0 12px; }
+.az-msg { max-width: 82%; padding: 10px 14px; border-radius: 18px; background: var(--card); border: 1px solid var(--line); align-self: flex-start; white-space: pre-wrap; }
+.az-msg.mine { align-self: flex-end; background: var(--tint-gold); border-color: transparent; }
+.az-msg small { display: block; margin-top: 2px; font-size: .72rem; color: var(--muted); text-align: right; }
+.az-day { align-self: center; font-size: .8rem; color: var(--muted); padding: 4px 10px; }
+.az-send { position: sticky; bottom: calc(64px + env(safe-area-inset-bottom)); display: grid; grid-template-columns: 1fr auto; gap: 8px; padding: 10px 0; background: var(--bg); }
+@media (min-width: 1001px) { .az-send { bottom: 0; } }
+.az-send textarea { min-height: 54px; max-height: 9rem; resize: none; }
+.az-chat-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.az-avatar { width: 2.8rem; height: 2.8rem; border-radius: 50%; background: var(--g-c); color: #fff; font-weight: 800; display: grid; place-items: center; flex: none; }
+.az-unread { min-width: 28px; height: 28px; padding: 0 8px; border-radius: 14px; background: var(--terra); color: #fff; font-weight: 800; font-size: .8rem; display: grid; place-items: center; }
+.az-empty { text-align: center; color: var(--muted); padding: 30px 10px; }
+.az-empty .i { width: 3rem; height: 3rem; display: block; margin: 0 auto 8px; }
+.az-app-flag { font-size: 2rem; line-height: 1; width: 2.6rem; text-align: center; flex: none; }
+
+/* ---------- Карта ---------- */
+.az-map { height: min(60vh, 520px); border-radius: var(--radius); border: 1px solid var(--line); overflow: hidden; background: var(--bg-2); z-index: 0; box-shadow: var(--shadow); }
+.az-pin { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; color: #fff; border: 2px solid #fff; box-shadow: 0 1px 4px rgba(0, 0, 0, .35); }
+.az-pin .i { width: 16px; height: 16px; }
+.az-pin.big { width: 2.6rem; height: 2.6rem; flex: none; }
+.az-pin.big .i { width: 1.3rem; height: 1.3rem; }
+.leaflet-popup-content { font: 600 15px/1.4 var(--font); }
+.leaflet-popup-content a { font-weight: 800; }
+
+/* ---------- Мой ID ---------- */
+.az-id { text-align: center; background: var(--tint-gold); border-color: var(--gold); }
+.az-id small { display: block; font-weight: 700; color: var(--muted); }
+.az-id > b { display: block; font-size: 2.6rem; letter-spacing: .06em; color: var(--gold-ink); line-height: 1.2; margin: 4px 0; font-variant-numeric: tabular-nums; }
+.az-id p { margin: 6px 0 0; color: var(--muted); font-size: .9rem; }
+.az-myid b { font-size: 1.3rem; letter-spacing: .05em; font-variant-numeric: tabular-nums; }
+
+/* ---------- SOS ---------- */
+.az-sos { display: grid; gap: 12px; }
+.az-call {
+  display: flex; align-items: center; gap: 16px; padding: 18px; border-radius: var(--radius); border: 2px solid var(--terra); font: inherit;
+  background: var(--tint-red); color: var(--text); text-decoration: none; cursor: pointer; text-align: left; width: 100%;
+}
+.az-call b { font-size: 2rem; color: var(--terra); min-width: 4.2rem; }
+.az-call span { font-weight: 800; font-size: 1.1rem; }
+
+/* ---------- Настройки ---------- */
+.az-seg { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 8px; }
+.az-seg button { min-height: 54px; border-radius: 14px; border: 1px solid var(--line); background: var(--card); color: var(--text); font: inherit; font-weight: 800; cursor: pointer; }
+.az-seg button.on { border-color: var(--gold); background: var(--tint-gold); color: var(--tint-gold-ink); }
+
+/* ---------- Подтверждение и подсказка ---------- */
+.az-confirm { position: fixed; inset: 0; z-index: 2100; display: grid; place-items: center; padding: 16px; background: rgba(5, 15, 22, .6); }
+.az-confirm > div { width: min(420px, 100%); background: var(--card); color: var(--text); border-radius: 22px; padding: 22px; text-align: center; box-shadow: var(--shadow-lg); }
+.az-confirm h3 { margin: 0 0 8px; font-size: 1.3rem; }
+.az-confirm p { margin: 0 0 16px; color: var(--muted); }
+.az-confirm .az-btns { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+/* Телефон: в шапке — название HAMYOL (а не подпись «Азербайджан»), счётчики — сеткой 2×2, без прокрутки вбок */
+@media (max-width: 600px) {
+  .az-app .brand-word { display: inline; font-size: 17px; }
+  .az-sub { display: none; }
+  .az-app .stats { display: grid; grid-template-columns: 1fr 1fr; grid-auto-flow: row; overflow: visible; gap: 10px; }
+  .az-app .stat { min-width: 0; }
+}
+
+/* Нижнее меню: SOS посередине (как в узбекском приложении) */
+.az-app .bottom-nav a span { white-space: nowrap; }
+.az-cover.photo-in { animation: heroIn .6s var(--ease); }
+
+/* Офлайн-азербайджанский: ход скачивания и «скачано» */
+.az-pbar { height: 12px; border-radius: 99px; background: var(--line); overflow: hidden; margin: 6px 0; }
+.az-pbar i { display: block; height: 100%; width: 0; background: var(--green); border-radius: inherit; transition: width .3s; }
+.az-ok { display: flex; align-items: center; gap: 8px; margin: 0; font-weight: 700; color: var(--green-ink); flex-basis: 100%; }
+
+/* Цены на карте: подпись под значком (при отдалении прячется), строка в карточке и в списках */
+.az-pin-price { position: absolute; top: 31px; left: 50%; transform: translateX(-50%); white-space: nowrap; font: 700 11px/1.2 var(--font); font-style: normal;
+  background: #fff; color: #1c2433; padding: 1px 6px; border-radius: 99px; box-shadow: 0 1px 3px rgba(0, 0, 0, .35); pointer-events: none; }
+.az-pin-price.exact { background: #177a47; color: #fff; }
+.az-map.far .az-pin-price { display: none; }
+.az-pin-price.hide { visibility: hidden; }
+.az-price-line { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; margin: 6px 0; }
+.az-price-line .i { width: 18px; height: 18px; color: var(--green-ink); }
+.az-price-line small { flex-basis: 100%; color: var(--muted); }
+.az-price-card .az-price-line { margin: 0; font-size: 1.1rem; }
+.az-row .az-row-price, .row .az-row-price { color: var(--green-ink); font-weight: 700; }
+.az-pin-price { text-align: center; }
+.az-pin-price small { display: block; font-size: 10px; font-weight: 600; opacity: .8; }
+.az-uzs { color: var(--muted); font-weight: 600; }
+
+/* Кружок «здесь несколько мест» на карте */
+.az-cluster { display: grid; place-items: center; border-radius: 50%; background: #0b1f3a; color: #fff; font: 800 14px/1 var(--font);
+  border: 3px solid #fff; box-shadow: 0 1px 6px rgba(0, 0, 0, .4); cursor: pointer; }
+
+/* Навигатор (js/az-nav.js) */
+.nav-wrap { position: relative; scroll-margin-top: 70px; }
+.nav-map { height: 52vh; min-height: 300px; }
+.nav-wrap.following .nav-map { height: 70vh; }
+.nav-banner { position: absolute; z-index: 500; top: 10px; left: 10px; right: 10px; display: flex; align-items: center; gap: 12px; padding: 12px 14px;
+  background: #0b1f3a; color: #fff; border-radius: 16px; box-shadow: 0 4px 14px rgba(0, 0, 0, .35); }
+.nav-banner .i { width: 2.4rem; height: 2.4rem; flex: none; color: #f0c25e; }
+.nav-banner b { display: block; font-size: 1.5rem; line-height: 1.1; }
+.nav-banner span { font-size: 1.05rem; }
+.nav-compass { position: absolute; z-index: 500; top: 10px; right: 10px; width: 120px; padding: 10px; text-align: center; background: #0b1f3a; color: #fff;
+  border-radius: 16px; box-shadow: 0 4px 14px rgba(0, 0, 0, .35); }
+.nav-compass .nav-arrow { display: grid; place-items: center; width: 64px; height: 64px; margin: 0 auto 4px; border-radius: 50%; background: #1a73e8; transition: transform .3s; }
+.nav-compass .nav-arrow .i { width: 40px; height: 40px; }
+.nav-compass b { display: block; font-size: 1.2rem; }
+.nav-compass small { display: block; opacity: .85; }
+.nav-center { position: absolute; z-index: 500; right: 10px; bottom: 28px; width: 48px; height: 48px; border-radius: 50%; border: 0; background: #fff; color: #1a73e8;
+  display: grid; place-items: center; box-shadow: 0 2px 8px rgba(0, 0, 0, .35); cursor: pointer; }
+.nav-center .i { width: 24px; height: 24px; }
+.nav-me { display: block; width: 22px; height: 22px; border-radius: 50%; background: #1a73e8; border: 4px solid #fff; box-shadow: 0 0 0 6px rgba(26, 115, 232, .25); }
+.nav-dest { background: #c0392b; width: 34px; height: 34px; }
+.nav-total b { display: block; font-size: 1.8rem; color: var(--green-ink); }
+.nav-total span { color: var(--muted); font-weight: 600; }
+.nav-step { display: flex; gap: 12px; align-items: flex-start; padding: 12px 4px; border-bottom: 1px solid var(--line); }
+.nav-step > .i { width: 1.8rem; height: 1.8rem; flex: none; color: var(--gold-ink); }
+.nav-step b { display: block; font-size: 1.05rem; }
+.nav-step small { color: var(--muted); }
+.nav-step.on { background: var(--tint-gold, rgba(230, 180, 80, .15)); border-radius: 12px; }
+
+/* Транспорт (js/az-transit.js): линии метро, остановки, номера автобусов, шаги маршрута */
+.tr-dot { display: inline-block; width: 14px; height: 14px; border-radius: 50%; vertical-align: middle; }
+.tr-line { padding: 6px 16px; }
+.tr-st { display: flex; align-items: center; gap: 12px; padding: 9px 0; color: var(--text); text-decoration: none; font-weight: 600; position: relative; }
+.tr-st + .tr-st { border-top: 1px solid var(--line); }
+.tr-st i { width: 14px; height: 14px; border-radius: 50%; border: 4px solid; background: var(--card); flex: none; }
+.tr-num { display: grid; place-items: center; min-width: 3rem; height: 2.4rem; padding: 0 6px; border-radius: 10px; background: #e07b00; color: #fff; font-weight: 800; font-size: 1.1rem; flex: none; }
+.tr-ic { display: grid; place-items: center; width: 2.2rem; height: 2.2rem; border-radius: 50%; color: #fff; flex: none; }
+.tr-ic .i { width: 1.2rem; height: 1.2rem; }
+.tr-past td { opacity: .45; }
+.az-table small { color: var(--muted); }
+/* «Ко мне»: карту сдвинули рукой — кнопка заметнее, нажать — вернуться к себе */
+.nav-center.on { background: #1a73e8; color: #fff; animation: navPulse 1.6s ease-in-out infinite; }
+@keyframes navPulse { 50% { box-shadow: 0 0 0 10px rgba(26, 115, 232, .25); } }
+@media (prefers-reduced-motion: reduce) { .nav-center.on { animation: none; } }
+
+/* Разговор голосом (js/az-talk.js): две большие кнопки-микрофона; горит и пульсирует, пока слушает */
+.az-talk { border: 2px solid var(--gold, #e6b450); }
+.talk-lang { display: flex; align-items: center; gap: 10px; font-weight: 700; margin-bottom: 12px; }
+.talk-lang .az-select { flex: 1; }
+.talk-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.talk-mic { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 18px 8px; border-radius: 22px; border: 3px solid transparent;
+  font: inherit; color: #fff; cursor: pointer; text-align: center; transition: transform .15s, box-shadow .2s; }
+.talk-mic.me { background: linear-gradient(135deg, #24508f, #0b1f3a); }
+.talk-mic.them { background: linear-gradient(135deg, #2bb8cc, #136a82); }
+.talk-mic b { font-size: 1.25rem; }
+.talk-mic small { opacity: .9; font-size: .82rem; }
+.talk-ico { display: grid; place-items: center; width: 64px; height: 64px; border-radius: 50%; background: rgba(255, 255, 255, .18); }
+.talk-ico .i { width: 34px; height: 34px; }
+.talk-mic.on { background: linear-gradient(135deg, #e5484d, #b3261e); border-color: #fff; transform: scale(1.04); animation: talkPulse 1.2s ease-in-out infinite; }
+.talk-mic.on .talk-ico { background: #fff; color: #c0392b; }
+@keyframes talkPulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(229, 72, 77, .55); } 50% { box-shadow: 0 0 0 16px rgba(229, 72, 77, 0); } }
+.talk-live { margin-top: 12px; padding: 14px; border-radius: 16px; background: rgba(229, 72, 77, .1); border: 2px solid #e5484d; text-align: center; }
+.talk-live b { display: block; font-size: 1.15rem; color: #c0392b; }
+.talk-live p { margin: 6px 0 0; font-size: 1.15rem; font-weight: 600; min-height: 1.4em; }
+.talk-live .talk-draft { color: var(--green-ink); font-size: 1.3rem; }
+.talk-live small { color: var(--muted); }
+.talk-bars { display: inline-flex; gap: 4px; height: 28px; align-items: center; margin-bottom: 4px; }
+.talk-bars i { width: 6px; height: 8px; border-radius: 3px; background: #e5484d; transition: height .2s; }
+.talk-live.hearing .talk-bars i { animation: talkBar .6s ease-in-out infinite; }
+.talk-live.hearing .talk-bars i:nth-child(2) { animation-delay: .1s; } .talk-live.hearing .talk-bars i:nth-child(3) { animation-delay: .2s; }
+.talk-live.hearing .talk-bars i:nth-child(4) { animation-delay: .3s; } .talk-live.hearing .talk-bars i:nth-child(5) { animation-delay: .15s; }
+@keyframes talkBar { 0%, 100% { height: 6px; } 50% { height: 26px; } }
+.talk-res { margin-top: 12px; padding: 14px; border-radius: 16px; background: var(--card); border: 1px solid var(--line); border-left: 6px solid #24508f; }
+.talk-res.them { border-left-color: #2bb8cc; }
+.talk-res small { color: var(--muted); display: block; }
+.talk-res p { margin: 6px 0 8px; font-size: 1.6rem; font-weight: 800; line-height: 1.25; }
+@media (prefers-reduced-motion: reduce) { .talk-mic.on, .talk-live.hearing .talk-bars i { animation: none; } .talk-live.hearing .talk-bars i { height: 20px; } }
+
+/* Мои места (js/az-places.js) */
+.pl-save.on { color: var(--gold-ink); border-color: var(--gold, #e6b450); }
+.pl-save .i.fill, .pl-mini .i.fill { fill: currentColor; }
+.pl-mini { font: 700 13px var(--font); padding: 6px 10px; border-radius: 99px; border: 1px solid var(--line); background: #fff; color: #1c2433; cursor: pointer; }
+.pl-mini.on { background: #fff3d6; color: #8a6210; }
+.pl-pin { width: 32px; height: 32px; }
+.pl-pin.home { background: #1898ad; } .pl-pin.fav { background: #c98f22; }
+.pl-row > div { min-width: 0; }
+
+/* SOS — последней плиткой во всю ширину (экстренная помощь заметнее) */
+.az-tiles .az-tile.t-sos { grid-column: 1 / -1; }
+
+/* Перевод по фото (js/az-photo.js) */
+.az-photo label.az-btn { cursor: pointer; }
+.ph-prev { display: block; width: 100%; max-height: 220px; object-fit: contain; border-radius: 12px; margin-top: 10px; background: #000; }
+.ph-list { margin-top: 10px; }
+.ph-item { padding: 10px 0; border-top: 1px solid var(--line); }
+.ph-item small { color: var(--muted); display: block; }
+.ph-item p { margin: 4px 0 0; font-size: 1.25rem; font-weight: 700; }
+
+/* Такси (js/az-taxi.js): карточка для водителя — крупно, светлая, читается с расстояния */
+.taxi-card { background: #fff; color: #111; border-radius: 20px; padding: 18px; text-align: center; border: 3px solid #e6b450; margin-bottom: 12px; }
+.taxi-card small { display: block; color: #555; font-size: 1rem; }
+.taxi-card b { display: block; font-size: 2rem; line-height: 1.2; margin: 8px 0; }
+.taxi-card p { margin: 0 0 6px; font-size: 1.25rem; font-weight: 600; }
+.taxi-ph b { font-size: 1.1rem; }
+
+/* Напоминание о поезде и выбор направления перевода */
+.tr-bell { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--line); background: var(--card); color: var(--gold-ink); cursor: pointer; }
+.tr-bell .i { width: 20px; height: 20px; }
+.mt-dirs { display: grid; gap: 8px; margin: 4px 0 12px; }
+.mt-dir { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 14px; font-weight: 600; cursor: pointer; }
+.mt-dir input { width: 22px; height: 22px; accent-color: #1f9d5c; flex: none; }
+.mt-dir small { margin-left: auto; color: var(--muted); white-space: nowrap; }
+.pl-del { margin-top: 8px; border: 0; background: none; color: var(--muted); font: inherit; cursor: pointer; display: inline-flex; gap: 6px; align-items: center; }
+
+/* Автоскачивание ближайшего города — переключатель */
+.auto-dl { display: flex; gap: 14px; align-items: flex-start; cursor: pointer; }
+.auto-dl input { width: 26px; height: 26px; accent-color: #1f9d5c; flex: none; margin-top: 2px; }
+.auto-dl b { display: block; font-size: 1.05rem; }
+.auto-dl small { display: block; color: var(--muted); margin-top: 4px; }
