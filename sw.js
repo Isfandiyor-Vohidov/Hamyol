@@ -1,5 +1,5 @@
 // Сервис-воркер Safar: приложение открывается без интернета, карты и фото кэшируются.
-const VERSION = "safar-v153";
+const VERSION = "safar-v154";
 // Офлайн-наборы городов (js/offline.js): отдельный кэш, обновления приложения его не трогают
 const OFFLINE = "safar-offline";
 const MECCA_OFFLINE = "safar-mecca-offline-v1";

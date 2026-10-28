@@ -1525,7 +1525,7 @@ function trMic(btn) {
 }
 
 // ---------- Без интернета: приложение (свой сервис-воркер az-sw.js) и города ----------
-const OFF_DATA = "safar-az-offline", OFF_SHELL = "safar-az-v28";   // OFF_SHELL — как V в az-sw.js
+const OFF_DATA = "safar-az-offline", OFF_SHELL = "safar-az-v29";   // OFF_SHELL — как V в az-sw.js
 const offPacks = () => store.get("az_offline", {});
 const offBusy = new Set();
 const offUrl = id => `/az-offline/city/${id}.json`;
