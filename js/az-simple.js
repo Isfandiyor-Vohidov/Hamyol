@@ -78,9 +78,9 @@ function whereList(q) {
   const mine = placesAll().filter(p => !s || p.n.toLowerCase().includes(s));
   if (mine.length) html += `<h2 class="az-h2">${icon("star")} ${sm("mine")}</h2>` + mine.map(p => row(p.la, p.lo, p.n, p.k === "home" ? sm("back_hotel") : "", p.k === "home" ? "home" : "star", p.k === "home" ? "#1898ad" : "#c98f22")).join("");
   const near = USER_POS ? p => km(USER_POS, [p.la, p.lo]) : () => 0;
-  const pois = s.length >= 2 ? POIS.filter(p => p.hay.includes(s)).sort((a, b) => fame(b) - fame(a) || near(a) - near(b)).slice(0, 25)
+  const pois = s.length >= 2 ? smartFind(POIS, s, 25, (a, b) => fame(b) - fame(a) || near(a) - near(b))
     : POIS.filter(p => p.c === "a" && (!USER_POS || near(p) < 30)).sort((a, b) => fame(b) - fame(a)).slice(0, 12);
-  const cities = s.length >= 2 ? CITIES.filter(c => c.hay.includes(s)).slice(0, 5) : [];
+  const cities = s.length >= 2 ? smartFind(CITIES, s, 5, byPop) : [];
   if (cities.length || pois.length) html += `<h2 class="az-h2">${icon(s ? "search" : "star")} ${s ? sm("found") : sm("popular")}</h2>`;
   html += cities.map(c => row(c.lat, c.lon, cityName(c), LL("город", "city"), "city", "#24508f")).join("");
   html += pois.map(p => row(p.la, p.lo, poiName(p), `${typeLabel(p.s)} · ${cityName(p.city)}${USER_POS ? " · " + fmtDist(near(p)) : ""}`, poiIcon(p), CAT_COLOR[p.c])).join("");

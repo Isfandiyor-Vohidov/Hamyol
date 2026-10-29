@@ -638,14 +638,15 @@ Object.assign(TX, {
   on_map: ["На карте", "On the map"], no_details: ["Подробностей пока нет.", "No details yet."], nearby: ["Рядом стоит посмотреть", "Worth seeing nearby"], found: ["Найдено: {n}", "Found: {n}"]
 });
 const CITY_TAB = {};
-let PLACE_CAT = "a";
+let PLACE_CAT = "a", PLACE_KEEP = null;   // PLACE_KEEP — поиск и город при смене раздела
 // Запуск интерактивных частей новых экранов (вызывается из route после отрисовки)
 function screenStart(kind, id) {
   // Без интернета: все города с поиском — скачанные первыми, дальше крупные
   if (kind === "offline") {
     const draw = () => {
       const q = $("#offQ").value.trim().toLowerCase(), pk = offPacks();
-      const list = OFF_CITIES.filter(c => !q || c.city.hay.includes(q)).sort((a, b) => (pk[b.id] ? 1 : 0) - (pk[a.id] ? 1 : 0) || (b.city.pop || 0) - (a.city.pop || 0));
+      const found = q ? new Set(smartFind(CITIES, q)) : null;
+      const list = OFF_CITIES.filter(c => !found || found.has(c.city)).sort((a, b) => (pk[b.id] ? 1 : 0) - (pk[a.id] ? 1 : 0) || (b.city.pop || 0) - (a.city.pop || 0));
       paged($("#offCities"), list, offCityHtml, 12);
     };
     $("#offQ").oninput = draw;
@@ -655,7 +656,8 @@ function screenStart(kind, id) {
   if (kind === "cities") {
     const draw = () => {
       const q = $("#cityQ").value.trim().toLowerCase(), s = $("#citySort").value;
-      const list = CITIES.filter(c => !q || c.hay.includes(q)).sort(s === "name" ? (a, b) => cityName(a).localeCompare(cityName(b)) : s === "sights" ? (a, b) => b.counts.a - a.counts.a : (a, b) => (b.pop || 0) - (a.pop || 0));
+      const sort = s === "name" ? (a, b) => cityName(a).localeCompare(cityName(b)) : s === "sights" ? (a, b) => b.counts.a - a.counts.a : byPop;
+      const list = q ? smartFind(CITIES, q, Infinity, sort) : CITIES.slice().sort(sort);
       $("#cityFound").textContent = t("found", { n: list.length });
       paged($("#cityGrid"), list, cityCard, 24);
     };
@@ -666,11 +668,24 @@ function screenStart(kind, id) {
     PLACE_CAT = k;
     const draw = () => {
       const q = $("#placeQ").value.trim().toLowerCase(), c = $("#placeCity").value;
-      const list = POIS.filter(p => p.c === k && (!c || p.city.id === c) && (!q || p.hay.includes(q))).sort((a, b) => fame(b) - fame(a));
+      const pool = POIS.filter(p => p.c === k && (!c || p.city.id === c));
+      const list = q ? smartFind(pool, q, Infinity, byFame) : pool.sort(byFame);
       $("#placeFound").textContent = t("found", { n: fmtNum(list.length) });
       paged($("#placeList"), list, poiRow);
     };
     $("#placeQ").oninput = draw; $("#placeCity").onchange = draw; draw();
+    $("#placeCats").onclick = e => {
+      const b = e.target.closest("[data-place-cat]");
+      if (!b || b.dataset.placeCat === k) return;
+      PLACE_KEEP = { q: $("#placeQ").value, c: $("#placeCity").value };
+      location.hash = "#places/" + b.dataset.placeCat;
+    };
+    if (PLACE_KEEP) {
+      $("#placeQ").value = PLACE_KEEP.q;
+      if ([...$("#placeCity").options].some(o => o.value === PLACE_KEEP.c)) $("#placeCity").value = PLACE_KEEP.c;
+      PLACE_KEEP = null;
+      draw();
+    }
   }
   if (kind === "city" && CITY[id]) {
     const c = CITY[id];
@@ -693,12 +708,67 @@ Object.assign(TX, {
   map_in_view: ["Интересное на этой части карты", "Highlights in this part of the map"], details: ["Подробнее", "Details"],
   map_zoom_out: ["Здесь ничего нет — отдалите карту или выберите другой раздел.", "Nothing here — zoom out or pick another category."]
 });
+// ---------- Умный поиск ----------
+// «Баку», «Baku», «Bakı» и «Ьаку» (опечатка) находят одно и то же: названия приводим к общей латинской основе
+// (кириллица и азербайджанские буквы → простая латиница), а запрос сравниваем и с опечатками (1–2 буквы),
+// и в другой раскладке клавиатуры («ифлг» → «baku»).
+const SK_MAP = { а: "a", б: "b", в: "v", г: "g", ғ: "g", д: "d", е: "e", ё: "io", ж: "j", з: "z", и: "i", й: "i", к: "k", қ: "k", л: "l", м: "m", н: "n", о: "o", п: "p", р: "r",
+  с: "s", т: "t", у: "u", ў: "u", ф: "f", х: "h", ҳ: "h", ц: "s", ч: "c", ш: "s", щ: "s", ъ: "", ы: "i", ь: "", э: "e", ю: "iu", я: "ia",
+  ə: "e", ı: "i", i̇: "i", ö: "o", ü: "u", ş: "s", ç: "c", ğ: "g", x: "h", q: "k", w: "v", y: "i", "'": "", "ʼ": "", "‘": "", "’": "" };
+const skel = str => String(str || "").toLowerCase().normalize("NFC").replace(/./gu, ch => SK_MAP[ch] ?? ch)
+  .replace(/kh/g, "h").replace(/sh/g, "s").replace(/ch/g, "c").replace(/zh/g, "j").replace(/[^a-z0-9 ]+/g, " ").replace(/\s+/g, " ").trim();
+const KB_RU = "йцукенгшщзхъфывапролджэячсмитьбю", KB_EN = "qwertyuiop[]asdfghjkl;'zxcvbnm,.";
+const kbSwap = q => [...q].map(ch => { const i = KB_RU.indexOf(ch), j = KB_EN.indexOf(ch); return i >= 0 ? KB_EN[i] : j >= 0 ? KB_RU[j] : ch; }).join("");
+function lev(a, b, max) {
+  if (Math.abs(a.length - b.length) > max) return max + 1;
+  let prev = Array.from({ length: b.length + 1 }, (_, i) => i);
+  for (let i = 1; i <= a.length; i++) {
+    const cur = [i];
+    let low = i;
+    for (let j = 1; j <= b.length; j++) { cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)); low = Math.min(low, cur[j]); }
+    if (low > max) return max + 1;
+    prev = cur;
+  }
+  return prev[b.length];
+}
+// Насколько запрос подходит: 0 — точно, 1 — начало слова, 2+ — с опечатками; -1 — не подходит
+function smartScore(item, qs) {
+  const sk = item._sk ??= skel(item.hay);
+  if (!qs) return 0;
+  const at = sk.indexOf(qs);
+  if (at === 0 || (at > 0 && sk[at - 1] === " ")) return 0;
+  if (at > 0) return 1;
+  const max = qs.length <= 3 ? 0 : qs.length <= 6 ? 1 : 2;
+  if (!max) return -1;
+  let best = max + 1;
+  for (const w of sk.split(" ")) {
+    if (w.length < qs.length - max) continue;
+    best = Math.min(best, lev(qs, w.slice(0, qs.length), max), lev(qs, w, max));
+    if (best === 0) break;
+  }
+  return best <= max ? 1 + best : -1;
+}
+// Найти: список с оценкой; вариант запроса в другой раскладке — тоже
+function smartFind(items, q, limit = Infinity, tie = () => 0) {
+  // Слово не может начинаться с «ь»/«ъ» — это опечатка: рядом на клавиатуре «б» и «х» («Ьаку» → «Баку»)
+  const raw = q.trim().toLowerCase().replace(/(^|\s)ь/g, "$1б").replace(/(^|\s)ъ/g, "$1х"), qs = skel(raw), qs2 = skel(kbSwap(raw));
+  if (!qs) return items.slice(0, limit);
+  const out = [];
+  for (const it of items) {
+    let sc = smartScore(it, qs);
+    if (sc < 0 && qs2 && qs2 !== qs) { const s2 = smartScore(it, qs2); if (s2 >= 0) sc = s2 + 0.5; }
+    if (sc >= 0) out.push([sc, it]);
+  }
+  return out.sort((a, b) => a[0] - b[0] || tie(a[1], b[1])).slice(0, limit).map(x => x[1]);
+}
+const byFame = (a, b) => fame(b) - fame(a), byPop = (a, b) => (b.pop || 0) - (a.pop || 0);
+
 // Поиск на главной: города и места
 document.addEventListener("input", e => {
   if (e.target.id !== "azSearch") return;
   const q = e.target.value.trim().toLowerCase(), box = $("#azResults");
   if (q.length < 2) { box.classList.add("hidden"); return; }
-  const cs = CITIES.filter(c => c.hay.includes(q)).slice(0, 5), ps = POIS.filter(p => p.hay.includes(q)).sort((a, b) => fame(b) - fame(a)).slice(0, 8);
+  const cs = smartFind(CITIES, q, 5, byPop), ps = smartFind(POIS, q, 8, byFame);
   box.innerHTML = [...cs.map(c => `<a class="sr-item" href="#city/${c.id}"><span class="ic">${icon("city")}</span><div>${esc(cityName(c))}<small>${esc(c.n.az || "")}</small></div></a>`),
     ...ps.map(p => `<a class="sr-item" href="#place/${p.id}"><span class="ic">${icon(poiIcon(p))}</span><div>${esc(poiName(p))}<small>${typeLabel(p.s)} · ${esc(cityName(p.city))}</small></div></a>`)].join("") || `<div class="empty">${t("nothing")}</div>`;
   box.classList.remove("hidden");
@@ -1536,7 +1606,7 @@ function trMic(btn) {
 }
 
 // ---------- Без интернета: приложение (свой сервис-воркер az-sw.js) и города ----------
-const OFF_DATA = "safar-az-offline", OFF_SHELL = "safar-az-v30";   // OFF_SHELL — как V в az-sw.js
+const OFF_DATA = "safar-az-offline", OFF_SHELL = "safar-az-v31";   // OFF_SHELL — как V в az-sw.js
 const offPacks = () => store.get("az_offline", {});
 const offBusy = new Set();
 const offUrl = id => `/az-offline/city/${id}.json`;
