@@ -392,3 +392,44 @@ html:not(.simple) .only-simple { display: none !important; }
 @media (max-width: 1000px) {
   .az-app .bottom-nav { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); }
 }
+
+/* План поездки (js/az-plan.js) */
+.plan-cta { margin-top: 12px; border: 2px solid var(--gold, #e6b450); }
+.plan-cta > .i:first-child { color: var(--gold-ink); }
+.plan-form { display: grid; gap: 12px; }
+.plan-form label { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 6px 10px; font-weight: 700; }
+.plan-form label > .az-input, .plan-form .plan-money { grid-column: 1 / -1; }
+.plan-form .az-input { font-size: 1.25rem; padding: 14px; width: 100%; }
+.plan-money { display: grid; grid-template-columns: 1fr auto; gap: 8px; }
+.plan-sum { border-width: 2px; }
+.plan-sum.ok { border-color: #1f9d5c; } .plan-sum.maybe { border-color: #e6a93a; } .plan-sum.bad { border-color: #e5484d; }
+.plan-verdict { font-size: 1.2rem; margin: 0 0 10px; display: flex; gap: 8px; align-items: center; }
+.plan-sum.ok .plan-verdict { color: var(--green-ink); } .plan-sum.bad .plan-verdict { color: #c0392b; }
+.plan-nums { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.plan-nums div { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.plan-nums small { color: var(--muted); }
+.plan-nums b { font-size: 1.15rem; }
+.plan-nums .az-uzs { font-size: .8rem; }
+.plan-bar { position: relative; padding: 8px 0 14px; display: flex; justify-content: space-between; gap: 8px; font-weight: 600; }
+.plan-bar i { position: absolute; left: 0; bottom: 4px; height: 6px; border-radius: 99px; background: var(--green); }
+.plan-day h3 { display: flex; align-items: center; gap: 8px; margin: 0 0 8px; }
+.plan-day h3 small { margin-left: auto; color: var(--muted); font-weight: 700; }
+.plan-timeline { list-style: none; margin: 0 0 8px; padding: 0; }
+.plan-timeline li { display: flex; gap: 12px; padding: 8px 0; border-bottom: 1px dashed var(--line); }
+.plan-timeline time { flex: none; width: 3.2rem; font-weight: 800; color: var(--gold-ink); }
+.plan-timeline span { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.plan-timeline small { color: var(--muted); }
+.plan-timeline .i { width: 15px; height: 15px; vertical-align: -2px; }
+.plan-timeline a { color: var(--text); }
+.plan-line { border-top: 1px solid var(--line); }
+.plan-line summary { display: flex; gap: 10px; justify-content: space-between; align-items: center; padding: 10px 0; cursor: pointer; list-style: none; }
+.plan-line summary::-webkit-details-marker { display: none; }
+.plan-line summary span { display: flex; flex-direction: column; min-width: 0; font-weight: 700; }
+.plan-line summary small { color: var(--muted); font-weight: 500; }
+.plan-line summary b { white-space: nowrap; color: var(--green-ink); }
+.plan-line summary::after { content: "›"; transform: rotate(90deg); color: var(--muted); font-size: 1.2rem; }
+.plan-line[open] summary::after { transform: rotate(-90deg); }
+.plan-why { padding: 0 0 12px; }
+.plan-why p { margin: 4px 0; }
+.plan-why small { color: var(--muted); }
+.plan-eco { margin: 10px 0 0; padding: 10px 12px; border-radius: 12px; background: rgba(230, 180, 80, .14); font-weight: 600; }

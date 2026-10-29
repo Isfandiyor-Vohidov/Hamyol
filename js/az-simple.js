@@ -92,6 +92,7 @@ document.addEventListener("input", e => { if (e.target.id === "whereQ") whereLis
 function moreScreen() {
   const r = (href, ic, k) => row(href, ic, sm(k), "");
   return `${head("grid", sm("more"))}
+    ${row("#plan/baku", "sparkles", pl("btn"), pl("btn_sub"))}
     ${r("#map", "map", "m_map")}${r("#places", "dome", "m_places")}${r("#cities", "city", "m_cities")}${r("#buses", "bus", "m_buses")}
     ${row("#mine", "star", sm("mine"), "")}${r("#chat", "message", "m_chat")}${r("#pay", "credit-card", "m_pay")}${r("#trips", "route", "m_trips")}
     ${r("#offline", "download", "m_off")}${r("#account", "user", "m_acc")}

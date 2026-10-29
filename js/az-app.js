@@ -626,7 +626,7 @@ Object.assign(TX, {
   data_src: ["Данные: OpenStreetMap, Wikidata, Википедия, Open-Meteo", "Data: OpenStreetMap, Wikidata, Wikipedia, Open-Meteo"],
   cities_lead: ["Нажмите на город — откроются места, отели и еда.", "Tap a city to see places, hotels and food."], search_city: ["Название города", "City name"],
   sort: ["Сортировка", "Sort"], sort_pop: ["Сначала крупные", "Largest first"], sort_sights: ["Больше мест", "Most sights"], sort_name: ["По алфавиту", "A–Z"],
-  city: ["город", "city"], town: ["посёлок", "town"], cat_a: ["Места", "Sights"], cat_h: ["Отели", "Hotels"], cat_f: ["Еда", "Food"], cat_s: ["Магазины", "Shops"], nav_talk: ["Перевод", "Translate"], nav_where: ["Маршрут", "Route"], nav_more: ["Ещё", "More"],
+  city: ["город", "city"], town: ["посёлок", "town"], cat_a: ["Места", "Sights"], cat_h: ["Отели", "Hotels"], cat_f: ["Еда", "Food"], cat_s: ["Магазины", "Shops"], plan_t: ["План поездки", "Trip plan"], nav_talk: ["Перевод", "Translate"], nav_where: ["Маршрут", "Route"], nav_more: ["Ещё", "More"],
   auto_title: ["Скачивать для работы без интернета само", "Download for offline use automatically"],
   auto_sub: ["Сразу при открытии приложения сами скачиваются: город, где вы сейчас (или Баку), перевод по фото и азербайджанский переводчик. Всё будет работать без интернета, даже если вы забыли. Не на медленной связи и не при экономии трафика.", "As soon as you open the app it downloads by itself: the city you are in (or Baku), photo translation and the Azerbaijani translator. Everything works offline even if you forget. Not on slow connections or with Data Saver on."],
   auto_ocr: ["Перевод по фото скачан — работает без интернета", "Photo translation downloaded — works offline"],
@@ -823,6 +823,7 @@ const SCREENS = {
   mine() { return placesScreen(); },
   where(sub) { return whereScreen(sub); },
   more() { return moreScreen(); },
+  plan(id) { return planScreen(id); },
   taxi(id) { return taxiScreen(id); },
 
   home() {
@@ -917,6 +918,7 @@ const SCREENS = {
       <div class="az-facts"><span>${icon("dome")} ${c.counts.a} ${t("cat_a").toLowerCase()}</span><span>${icon("hotel")} ${c.counts.h} ${t("cat_h").toLowerCase()}</span><span>${icon("food")} ${c.counts.f} ${t("cat_f").toLowerCase()}</span><span id="cityWx"></span></div>
       <div class="az-btns two">${goBtn(c.lat, c.lon, cityName(c))}
         ${OFF_CITY[c.id] ? `<a class="az-btn ghost" href="${offPacks()[c.id] ? `#map/${c.id}` : "#offline"}">${icon("map-pinned")} ${t("map_offline_btn")}</a>` : `<a class="az-btn ghost" href="#map/@${c.id}">${icon("map")} ${t("nav_map")}</a>`}</div>
+      <a class="az-row plan-cta" href="#plan/${c.id}">${icon("sparkles")}<div><b>${pl("btn")}</b><small>${pl("btn_sub")}</small></div>${icon("chevron-right", "go")}</a>
       <div class="az-card az-story" id="cityStory" style="margin-top:14px"><p class="hint">…</p></div>
       <div class="az-chips" id="cityTabs">${["a", "h", "f", "s"].filter(k => c.counts[k]).map(k => `<button type="button" class="${k === tab ? "on" : ""}" data-city-tab="${k}">${icon(CAT_ICON[k])} ${t("cat_" + k)} (${c.counts[k]})</button>`).join("")}</div>
       <div class="list" id="cityList"></div>`;
@@ -1149,7 +1151,7 @@ function startScreen(kind, id) {
   if (kind === "go") navStart(id);
   if (kind === "buses" && (id === "metro" || id === "trains" || id === "routes" || /^r\d+$/.test(id || ""))) transitStart(id);
   $$("[data-tab]").forEach(x => x.classList.toggle("active", x.dataset.tab === ({ city: "cities", place: "places", pay: "buses" }[kind] || kind || "home")));
-  const title = { go: "route_btn", mine: "mine", taxi: "taxi_t", where: "nav_where", more: "nav_more", trips: "trips", buses: "buses", pay: "pay", translate: "tr", chat: "chat", sos: "sos", account: "account", offline: "off", map: "nav_map", cities: "nav_cities", places: "nav_places" }[kind];
+  const title = { go: "route_btn", mine: "mine", taxi: "taxi_t", where: "nav_where", more: "nav_more", plan: "plan_t", trips: "trips", buses: "buses", pay: "pay", translate: "tr", chat: "chat", sos: "sos", account: "account", offline: "off", map: "nav_map", cities: "nav_cities", places: "nav_places" }[kind];
   document.title = (kind === "city" && CITY[id] ? cityName(CITY[id]) + " — " : kind === "place" && POI[id] ? poiName(POI[id]) + " — " : title ? t(title) + " — " : "") + "Hamyol · " + t("app_sub");
 }
 
@@ -1606,7 +1608,7 @@ function trMic(btn) {
 }
 
 // ---------- Без интернета: приложение (свой сервис-воркер az-sw.js) и города ----------
-const OFF_DATA = "safar-az-offline", OFF_SHELL = "safar-az-v31";   // OFF_SHELL — как V в az-sw.js
+const OFF_DATA = "safar-az-offline", OFF_SHELL = "safar-az-v32";   // OFF_SHELL — как V в az-sw.js
 const offPacks = () => store.get("az_offline", {});
 const offBusy = new Set();
 const offUrl = id => `/az-offline/city/${id}.json`;
