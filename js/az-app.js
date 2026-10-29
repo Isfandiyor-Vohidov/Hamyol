@@ -626,7 +626,7 @@ Object.assign(TX, {
   data_src: ["Данные: OpenStreetMap, Wikidata, Википедия, Open-Meteo", "Data: OpenStreetMap, Wikidata, Wikipedia, Open-Meteo"],
   cities_lead: ["Нажмите на город — откроются места, отели и еда.", "Tap a city to see places, hotels and food."], search_city: ["Название города", "City name"],
   sort: ["Сортировка", "Sort"], sort_pop: ["Сначала крупные", "Largest first"], sort_sights: ["Больше мест", "Most sights"], sort_name: ["По алфавиту", "A–Z"],
-  city: ["город", "city"], town: ["посёлок", "town"], cat_a: ["Места", "Sights"], cat_h: ["Отели", "Hotels"], cat_f: ["Еда", "Food"], cat_s: ["Магазины", "Shops"],
+  city: ["город", "city"], town: ["посёлок", "town"], cat_a: ["Места", "Sights"], cat_h: ["Отели", "Hotels"], cat_f: ["Еда", "Food"], cat_s: ["Магазины", "Shops"], nav_talk: ["Перевод", "Translate"], nav_where: ["Маршрут", "Route"], nav_more: ["Ещё", "More"],
   auto_title: ["Скачивать для работы без интернета само", "Download for offline use automatically"],
   auto_sub: ["Сразу при открытии приложения сами скачиваются: город, где вы сейчас (или Баку), перевод по фото и азербайджанский переводчик. Всё будет работать без интернета, даже если вы забыли. Не на медленной связи и не при экономии трафика.", "As soon as you open the app it downloads by itself: the city you are in (or Baku), photo translation and the Azerbaijani translator. Everything works offline even if you forget. Not on slow connections or with Data Saver on."],
   auto_ocr: ["Перевод по фото скачан — работает без интернета", "Photo translation downloaded — works offline"],
@@ -751,9 +751,12 @@ document.addEventListener("click", e => { if (e.target.closest("[data-back]")) g
 const SCREENS = {
   go(id) { return navScreen(id); },
   mine() { return placesScreen(); },
+  where(sub) { return whereScreen(sub); },
+  more() { return moreScreen(); },
   taxi(id) { return taxiScreen(id); },
 
   home() {
+    if (isSimple()) return simpleHome();
     const tile = (href, ic, k, cls, badge = "") => `<a class="az-tile ${cls}" href="${href}"><i>${icon(ic)}</i><span>${t(k)}</span><small>${t(k + "_sub")}</small>${badge}</a>`;
     const unread = CHAT.unread ? `<span class="az-badge">${CHAT.unread}</span>` : "";
     const cnt = c => fmtNum(POIS.filter(p => p.c === c).length);
@@ -960,8 +963,10 @@ const SCREENS = {
     const st = trState();
     const opt = v => Object.entries(TR_LANGS).map(([k, n]) => `<option value="${k}" ${k === v ? "selected" : ""}>${n[0]}</option>`).join("");
     return `${head("languages", t("tr"), t("tr_lead"))}
-      ${talkHtml()}
-      ${photoHtml()}
+      ${trTabsHtml()}
+      <section class="tr-sec ${trSecCls("voice")}" data-trsec="voice">${talkHtml()}</section>
+      <section class="tr-sec ${trSecCls("photo")}" data-trsec="photo">${photoHtml()}</section>
+      <section class="tr-sec ${trSecCls("text")}" data-trsec="text">
       <div class="az-langs"><select class="az-select" id="trFrom" aria-label="From">${opt(st.from)}</select>
         <button type="button" class="az-swap" data-tr-swap aria-label="Swap">${icon("exchange")}</button>
         <select class="az-select" id="trTo" aria-label="To">${opt(st.to)}</select></div>
@@ -969,9 +974,13 @@ const SCREENS = {
       <div class="az-btns two"><button type="button" class="az-btn" data-tr-go>${icon("languages")} ${t("tr_go")}</button><button type="button" class="az-btn ghost" data-tr-mic>${icon("mic")} ${t("tr_mic")}</button></div>
       <div id="trOut"></div>
       <div id="trHist">${trHistHtml()}</div>
+      </section>
+      <section class="tr-sec ${trSecCls("phrases")}" data-trsec="phrases">
       <h2 class="az-h2">${t("tr_phrases")}</h2>
       <div class="az-chips" role="tablist">${PHRASE_GROUPS.map(g => `<button type="button" role="tab" class="${g.id === trGroup() ? "on" : ""}" data-tr-group="${g.id}" aria-selected="${g.id === trGroup()}">${icon(g.ic)} ${LL(...g.n)}</button>`).join("")}</div>
       <div id="trPhrases">${trPhrasesHtml()}</div>
+      </section>
+      <section class="tr-sec tr-dl" data-trsec="dl">
       <h2 class="az-h2">${icon("download")} ${t("mt_title")}</h2>
       <div class="az-card" id="mtBox">${mtBoxHtml()}</div>
       ${/Android/i.test(navigator.userAgent) ? `<h2 class="az-h2">${icon("download")} ${t("tr_dl")}</h2>
@@ -980,7 +989,8 @@ const SCREENS = {
       <h2 class="az-h2">${t("tr_any_off")}</h2>
       <div class="az-card"><p style="margin-top:0">${t("tr_google_tip")}</p>
         <ol class="az-list"><li>${t("tr_g1")}</li><li>${t("tr_g2")}</li><li>${t("tr_g3")}</li></ol>
-        <div class="az-btns">${ext("https://translate.google.com/?sl=auto&tl=az&op=translate", "external", t("tr_google"), "ghost")}</div></div>`;
+        <div class="az-btns">${ext("https://translate.google.com/?sl=auto&tl=az&op=translate", "external", t("tr_google"), "ghost")}</div></div>
+      </section>`;
   },
 
   chat(id) { return chatScreen(id); },
@@ -999,6 +1009,7 @@ const SCREENS = {
     const dark = isDark();
     return `${head("user", t("account"))}
       ${row("#mine", "star", pt("title"), pt("sub"))}
+      <button type="button" class="az-row sm-mode" ${isSimple() ? "data-simple-off" : "data-simple-on"}>${icon("layers")}<div><b>${sm(isSimple() ? "full" : "simple")}</b><small>${sm(isSimple() ? "full_sub" : "simple_sub")}</small></div>${icon("chevron-right", "go")}</button>
       ${CHAT.token ? idCard() : `<div class="az-card"><p style="margin-top:0">${t("id_login")}</p><div id="chatLogin" class="az-btns"><button type="button" class="az-btn" data-login>${icon("tg")} ${t("chat_login")}</button></div></div>`}
       ${CHAT.token ? `<h2 class="az-h2">${t("chat_my_name")}</h2>
         <form id="azName" class="az-btns" style="grid-template-columns:1fr auto"><input class="az-input" name="name" minlength="2" maxlength="40" value="${esc(CHAT.me?.name || "")}" aria-label="${esc(t("chat_my_name"))}"><button class="az-btn" type="submit">${t("chat_save")}</button></form>` : ""}
@@ -1068,7 +1079,7 @@ function startScreen(kind, id) {
   if (kind === "go") navStart(id);
   if (kind === "buses" && (id === "metro" || id === "trains" || id === "routes" || /^r\d+$/.test(id || ""))) transitStart(id);
   $$("[data-tab]").forEach(x => x.classList.toggle("active", x.dataset.tab === ({ city: "cities", place: "places", pay: "buses" }[kind] || kind || "home")));
-  const title = { go: "route_btn", mine: "mine", taxi: "taxi_t", trips: "trips", buses: "buses", pay: "pay", translate: "tr", chat: "chat", sos: "sos", account: "account", offline: "off", map: "nav_map", cities: "nav_cities", places: "nav_places" }[kind];
+  const title = { go: "route_btn", mine: "mine", taxi: "taxi_t", where: "nav_where", more: "nav_more", trips: "trips", buses: "buses", pay: "pay", translate: "tr", chat: "chat", sos: "sos", account: "account", offline: "off", map: "nav_map", cities: "nav_cities", places: "nav_places" }[kind];
   document.title = (kind === "city" && CITY[id] ? cityName(CITY[id]) + " — " : kind === "place" && POI[id] ? poiName(POI[id]) + " — " : title ? t(title) + " — " : "") + "Hamyol · " + t("app_sub");
 }
 
@@ -1318,7 +1329,7 @@ async function mtTranslate(text, from, to) {
   const r = await mtTr.translate({ from, to, text, html: false });
   return r.target.text.trim();
 }
-async function mtDownload() {
+async function mtDownload(quiet = false) {
   if (mtBusy) return;
   if (typeof WebAssembly !== "object" || !("caches" in window)) return toast(t("mt_old"));
   mtBusy = { got: 0, total: 1 };
@@ -1377,8 +1388,8 @@ async function mtDownload() {
     caches.delete(MT_PARTS).catch(() => {});
     mtHave = null;
     mtBusy = null;
-    toast(t("mt_done"));
-  } catch (e) { mtBusy = null; mtHave = null; if (e.message !== "space") toast(document.hidden ? t("mt_paused") : t("mt_fail")); }
+    if (!quiet) toast(t("mt_done"));
+  } catch (e) { mtBusy = null; mtHave = null; if (e.message !== "space" && !quiet) toast(document.hidden ? t("mt_paused") : t("mt_fail")); }
   mtUnwake();
   mtRedraw();
 }
@@ -1525,7 +1536,7 @@ function trMic(btn) {
 }
 
 // ---------- Без интернета: приложение (свой сервис-воркер az-sw.js) и города ----------
-const OFF_DATA = "safar-az-offline", OFF_SHELL = "safar-az-v29";   // OFF_SHELL — как V в az-sw.js
+const OFF_DATA = "safar-az-offline", OFF_SHELL = "safar-az-v30";   // OFF_SHELL — как V в az-sw.js
 const offPacks = () => store.get("az_offline", {});
 const offBusy = new Set();
 const offUrl = id => `/az-offline/city/${id}.json`;
@@ -1643,19 +1654,19 @@ async function autoOffline() {
       // Не получилось недавно — не мучаем сеть: следующая попытка через час
       if (done[c.id] && Date.now() - done[c.id] < 3600e3) continue;
       done[c.id] = Date.now(); store.set("az_auto_done", done);
-      toast(t("auto_start", { city: LL(...c.n) }));
-      if (await offDownloadCity(c.id, true)) toast(t("auto_done", { city: LL(...c.n) }));
+      if (!isSimple()) toast(t("auto_start", { city: LL(...c.n) }));
+      if (await offDownloadCity(c.id, true) && !isSimple()) toast(t("auto_done", { city: LL(...c.n) }));
     }
     // Потом — перевод по фото (~12 МБ) и азербайджанский переводчик (~144 МБ, с докачкой): тоже сами, по очереди
     if (!(await photoReadyCheck()) && !(done.ocr && Date.now() - done.ocr < 3600e3)) {
       done.ocr = Date.now(); store.set("az_auto_done", done);
-      try { await photoDownload(); toast(t("auto_ocr")); } catch { /* в следующий раз */ }
+      try { await photoDownload(); if (!isSimple()) toast(t("auto_ocr")); } catch { /* в следующий раз */ }
     }
     const mtHas = await mtDownloaded(), mtReady = mtPairs().every(p => mtHas.has(p));
     if (!mtReady && !mtBusy && !(done.mt && Date.now() - done.mt < 3600e3)) {
       done.mt = Date.now(); store.set("az_auto_done", done);
-      toast(t("auto_mt"));
-      await mtDownload();
+      if (!isSimple()) toast(t("auto_mt"));
+      await mtDownload(isSimple());
     }
   } finally { autoBusy = false; }
 }

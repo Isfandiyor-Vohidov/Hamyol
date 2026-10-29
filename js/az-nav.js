@@ -77,6 +77,7 @@ function navScreen(id) {
   const google = `https://www.google.com/maps/dir/?api=1&destination=${d.la},${d.lo}&travelmode=transit`;
   return `${head("directions", esc(name))}
     <div class="az-chips" id="navModes">${["walk", "transit", "drive"].map(m => `<button type="button" class="${m === store.get("az_nav_mode", "walk") ? "on" : ""}" data-nav-mode="${m}">${icon(m === "walk" ? "walk" : m === "transit" ? "bus" : "car")} ${nt(m)}</button>`).join("")}</div>
+    ${isSimple() ? `<button type="button" class="sm-other" data-nav-other>${icon("route")} ${sm("other_way")}</button>` : ""}
     <div class="nav-wrap"><div id="navMap" class="az-map nav-map"></div>
       <div class="nav-banner" id="navBanner" hidden></div>
       <div class="nav-compass" id="navCompass" hidden><span class="nav-arrow">${icon("arrow-up")}</span><b id="navCompassD"></b><small id="navCompassS"></small></div>
@@ -93,7 +94,7 @@ async function navStart(id) {
   // «Откуда» может быть задано заранее (маршрут метро от выбранной станции) — тогда без GPS
   const fixed = store.get("az_nav_from", null);
   store.set("az_nav_from", null);
-  Object.assign(AZNAV, { dest: d, mode: store.get("az_nav_mode", "walk"), route: null, plan: null, saved: false, straight: false, follow: false, step: 0, spoken: -1, pos: fixed || USER_POS || null, from: fixed });
+  Object.assign(AZNAV, { dest: d, mode: isSimple() ? "auto" : store.get("az_nav_mode", "walk"), route: null, plan: null, saved: false, straight: false, follow: false, step: 0, spoken: -1, pos: fixed || USER_POS || null, from: fixed });
   if (!(await loadLeaflet()) || !curHash.startsWith("#go/")) { $("#navMap")?.remove(); return navNoMap(); }
   AZNAV.map = L.map("navMap", { zoomControl: true }).setView([d.la, d.lo], 15);
   // Сдвинули или приблизили карту рукой — смотрите спокойно (конец пути и т. п.), к синей точке не возвращаем,
@@ -134,6 +135,11 @@ function navNoMap() {
 // Новое место: метка «я», маршрут при первом определении, ведение в режиме «Поехали»
 function navFix(pos, heading) {
   AZNAV.pos = pos; USER_POS = pos;
+  // Простой режим: ближе 1,5 км — пешком, дальше — на транспорте (метро, автобус); меняется кнопкой «Другой способ»
+  if (AZNAV.mode === "auto") {
+    AZNAV.mode = km(pos, [AZNAV.dest.la, AZNAV.dest.lo]) < 1.5 ? "walk" : "transit";
+    $$("[data-nav-mode]").forEach(b => b.classList.toggle("on", b.dataset.navMode === AZNAV.mode));
+  }
   if (heading != null && !isNaN(heading)) AZNAV.heading = heading;
   if (!AZNAV.map) return;
   if (!AZNAV.me) AZNAV.me = L.marker(pos, { zIndexOffset: 2000, icon: L.divIcon({ className: "", html: `<span class="nav-me"></span>`, iconSize: [22, 22], iconAnchor: [11, 11] }) }).addTo(AZNAV.map);

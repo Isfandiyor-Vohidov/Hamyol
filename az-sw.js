@@ -1,6 +1,6 @@
 // Сервис-воркер приложения «Азербайджан» (/az): своё приложение открывается без интернета.
 // Отдельный от узбекского sw.js и управляет только страницей /az (scope "/az"); чужие кэши не трогает.
-const V = "safar-az-v29";
+const V = "safar-az-v30";
 const DATA = "safar-az-offline";   // скачанные города (/az-offline/…) — обновления приложения их не удаляют
 const TILES = "safar-az-tiles";    // подложка карты — только те места, которые человек уже смотрел
 const TILE_LIMIT = 800;
@@ -9,7 +9,7 @@ const PHOTO_LIMIT = 1500;
 const MT = "safar-az-mt";          // офлайн-переводчик (движок и модели Mozilla) — скачивается по кнопке, обновления его не удаляют
 const OCR = "safar-az-ocr";        // перевод по фото (распознавание текста) — скачивается по кнопке
 const MAPS = "safar-az-maps";      // офлайн-карты городов (векторные, js/az-maps.js) — обновления приложения их не удаляют
-const SHELL = ["/az", "/css/style.css", "/css/az.css", "/js/az-app.js", "/js/az-nav.js", "/js/az-transit.js", "/js/az-talk.js", "/js/az-places.js", "/js/az-maps.js", "/js/az-photo.js", "/js/az-taxi.js", "/az-maps/lib.js", "/data/az-transit.js", "/js/icons.js", "/icons/icon.svg", "/data/az-cities.js", "/data/az-pois.js"];
+const SHELL = ["/az", "/css/style.css", "/css/az.css", "/js/az-app.js", "/js/az-nav.js", "/js/az-transit.js", "/js/az-talk.js", "/js/az-places.js", "/js/az-maps.js", "/js/az-photo.js", "/js/az-taxi.js", "/js/az-simple.js", "/az-maps/lib.js", "/data/az-transit.js", "/js/icons.js", "/icons/icon.svg", "/data/az-cities.js", "/data/az-pois.js"];
 const LIBS = ["https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css", "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"];
 
 self.addEventListener("install", e => {

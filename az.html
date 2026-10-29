@@ -23,6 +23,8 @@
       const r = document.documentElement, th = localStorage.getItem("az_theme"), sz = +localStorage.getItem("az_size") || 100;
       if (th) r.dataset.theme = th;
       r.classList.add("fs-text");
+      // Простой режим (по умолчанию) — только главное; полный — в «Ещё»
+      if (localStorage.getItem("az_simple") !== "false") r.classList.add("simple");
       r.style.setProperty("--az-size", sz / 100); r.style.setProperty("--uz", sz / 100); r.classList.toggle("big", sz >= 115);
     } catch {}
   </script>
@@ -33,11 +35,14 @@
       <a class="brand" href="#home" aria-label="Hamyol"><span class="az-flag" aria-hidden="true"></span><span class="brand-word">HAMYOL</span><span class="az-sub" data-t="app_sub"></span></a>
       <nav class="tabs" id="tabs">
         <a href="#home" data-tab="home" data-t="nav_home"></a>
-        <a href="#cities" data-tab="cities" data-t="nav_cities"></a>
-        <a href="#places" data-tab="places" data-t="nav_places"></a>
-        <a href="#map" data-tab="map" data-t="nav_map"></a>
-        <a href="#buses" data-tab="buses" data-t="nav_buses"></a>
-        <a href="#chat" data-tab="chat" data-t="nav_chat"></a>
+        <a href="#translate" data-tab="translate" data-t="nav_talk" class="only-simple"></a>
+        <a href="#where" data-tab="where" data-t="nav_where" class="only-simple"></a>
+        <a href="#more" data-tab="more" data-t="nav_more" class="only-simple"></a>
+        <a href="#cities" data-tab="cities" data-t="nav_cities" class="only-full"></a>
+        <a href="#places" data-tab="places" data-t="nav_places" class="only-full"></a>
+        <a href="#map" data-tab="map" data-t="nav_map" class="only-full"></a>
+        <a href="#buses" data-tab="buses" data-t="nav_buses" class="only-full"></a>
+        <a href="#chat" data-tab="chat" data-t="nav_chat" class="only-full"></a>
       </nav>
       <div class="tools">
         <button type="button" class="pill-select az-lang" id="azLang" aria-label="Language"></button>
@@ -52,12 +57,15 @@
     <!-- Нижнее меню (телефон): SOS посередине, как в узбекском приложении -->
     <nav class="bottom-nav" id="bottomNav">
       <a href="#home" data-tab="home"><svg class="i i-home" aria-hidden="true"><use href="#i-home"/></svg><span data-t="nav_home"></span></a>
-      <a href="#cities" data-tab="cities"><svg class="i i-city" aria-hidden="true"><use href="#i-city"/></svg><span data-t="nav_cities"></span></a>
-      <a href="#places" data-tab="places"><svg class="i i-dome" aria-hidden="true"><use href="#i-dome"/></svg><span data-t="nav_places"></span></a>
+      <a href="#translate" data-tab="translate" class="only-simple"><svg class="i i-mic" aria-hidden="true"><use href="#i-mic"/></svg><span data-t="nav_talk"></span></a>
+      <a href="#cities" data-tab="cities" class="only-full"><svg class="i i-city" aria-hidden="true"><use href="#i-city"/></svg><span data-t="nav_cities"></span></a>
+      <a href="#places" data-tab="places" class="only-full"><svg class="i i-dome" aria-hidden="true"><use href="#i-dome"/></svg><span data-t="nav_places"></span></a>
       <a href="#sos" class="nav-sos" data-tab="sos" aria-label="SOS"><b class="nav-sos-dot"><svg class="i i-siren" aria-hidden="true"><use href="#i-siren"/></svg></b><span>SOS</span></a>
-      <a href="#map" data-tab="map"><svg class="i i-map" aria-hidden="true"><use href="#i-map"/></svg><span data-t="nav_map"></span></a>
-      <a href="#buses" data-tab="buses"><svg class="i i-bus" aria-hidden="true"><use href="#i-bus"/></svg><span data-t="nav_buses"></span></a>
-      <a href="#chat" data-tab="chat"><svg class="i i-message" aria-hidden="true"><use href="#i-message"/></svg><span data-t="nav_chat"></span></a>
+      <a href="#where" data-tab="where" class="only-simple"><svg class="i i-directions" aria-hidden="true"><use href="#i-directions"/></svg><span data-t="nav_where"></span></a>
+      <a href="#more" data-tab="more" class="only-simple"><svg class="i i-grid" aria-hidden="true"><use href="#i-grid"/></svg><span data-t="nav_more"></span></a>
+      <a href="#map" data-tab="map" class="only-full"><svg class="i i-map" aria-hidden="true"><use href="#i-map"/></svg><span data-t="nav_map"></span></a>
+      <a href="#buses" data-tab="buses" class="only-full"><svg class="i i-bus" aria-hidden="true"><use href="#i-bus"/></svg><span data-t="nav_buses"></span></a>
+      <a href="#chat" data-tab="chat" class="only-full"><svg class="i i-message" aria-hidden="true"><use href="#i-message"/></svg><span data-t="nav_chat"></span></a>
     </nav>
   </div>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
@@ -72,6 +80,7 @@
   <script defer src="js/az-maps.js"></script>
   <script defer src="js/az-photo.js"></script>
   <script defer src="js/az-taxi.js"></script>
+  <script defer src="js/az-simple.js"></script>
   <script defer src="js/az-app.js"></script>
 </body>
 </html>
