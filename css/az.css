@@ -455,3 +455,21 @@ html:not(.simple) .only-simple { display: none !important; }
 .plan-cat-in { padding: 0 0 8px 10px; border-left: 3px solid var(--green); margin-bottom: 8px; }
 .plan-line summary::after, .plan-cat > summary::after { content: "▾"; transform: none; font-size: 1.1rem; }
 .plan-line[open] summary::after, .plan-cat[open] > summary::after { content: "▴"; transform: none; }
+
+/* Фото и прогулка по улице на весь экран (js/az-view.js) */
+.az-cover[data-cover] { cursor: zoom-in; }
+.az-cover-zoom { position: absolute; top: 12px; right: 12px; z-index: 2; width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; background: rgba(5, 12, 24, .55); color: #fff; }
+.az-cover-zoom .i { width: 20px; height: 20px; }
+html.view-on, html.view-on body { overflow: hidden; }
+.az-view { position: fixed; inset: 0; z-index: 2000; background: #000; display: flex; flex-direction: column; }
+.az-view-stage { flex: 1; min-height: 0; display: grid; place-items: center; overflow: hidden; touch-action: none; }
+.az-view-stage img { max-width: 100%; max-height: 100%; object-fit: contain; transform-origin: center; user-select: none; -webkit-user-drag: none; }
+.az-view-pano { flex: 1; width: 100%; border: 0; background: #222; }
+.az-view-cap { padding: 12px 16px calc(12px + env(safe-area-inset-bottom)); color: #fff; background: rgba(5, 12, 24, .92); display: flex; flex-direction: column; gap: 4px; }
+.az-view-cap b { font-size: 1.1rem; }
+.az-view-cap small { color: #c9d3e3; }
+.az-view-cap a { color: #9ec5ff; }
+.az-view-x { position: absolute; top: calc(12px + env(safe-area-inset-top)); right: 12px; z-index: 3; display: inline-flex; align-items: center; gap: 6px; padding: 12px 18px; border: 0; border-radius: 99px; background: #fff; color: #111; font: inherit; font-weight: 800; font-size: 1.05rem; box-shadow: 0 4px 16px rgba(0, 0, 0, .4); cursor: pointer; }
+.az-view.pano .az-view-cap { padding-bottom: 10px; }
+.az-view.pano .az-view-x { position: static; justify-content: center; margin: 0; border-radius: 0; padding: 16px; padding-bottom: calc(16px + env(safe-area-inset-bottom)); box-shadow: none; }
+.pano-row { width: 100%; margin-top: 10px; text-align: left; font: inherit; color: inherit; cursor: pointer; }

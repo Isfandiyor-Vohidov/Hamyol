@@ -547,15 +547,18 @@ const popText = n => n >= 1e6 ? LL(`${(n / 1e6).toFixed(1).replace(".", ",")} м
 // Список с кнопкой «Показать ещё»
 function paged(box, items, render, page = 20) {
   let shown = 0;
+  const key = curHash + "|" + (box.id || ""), want = PAGED.get(key) || page;
   const more = () => {
     box.querySelector(".az-more")?.remove();
     box.insertAdjacentHTML("beforeend", items.slice(shown, shown + page).map(render).join(""));
     shown += page;
+    PAGED.set(key, shown);
     if (shown < items.length) box.insertAdjacentHTML("beforeend", `<button type="button" class="az-btn ghost wide az-more">${icon("chevron-down")} ${t("more")} (${fmtNum(items.length - shown)})</button>`);
   };
   box.innerHTML = items.length ? "" : `<p class="az-empty">${icon("search")}${t("nothing")}</p>`;
   box.onclick = e => { if (e.target.closest(".az-more")) more(); };
   if (items.length) more();
+  while (shown < want && shown < items.length) more();
 }
 
 // ---------- Погода сейчас (Open-Meteo, бесплатно) и курс маната ----------
@@ -811,7 +814,26 @@ const ext = (href, ic, label, cls = "") => `<a class="az-btn ${cls}" href="${hre
 // ---------- «Назад»: история переходов внутри приложения ----------
 // «Назад» возвращает на предыдущий экран; если пришли по ссылке сразу внутрь — на главную, а не прочь из приложения
 const NAV = [];
-const SCROLL = new Map();
+const SCROLL = new Map(), OPENED = new Map(), PAGED = new Map();
+try { history.scrollRestoration = "manual"; } catch { /* старые браузеры */ }
+// Вернуть экран как был: раскрытые разделы и место прокрутки. Часть экрана дорисовывается позже (план, списки, фото) —
+// поэтому пробуем ~2 с, пока страница не станет достаточно длинной; человек сам листает — перестаём
+let restoreRun = 0;
+function restoreView(h) {
+  const y = SCROLL.get(h) || 0, open = OPENED.get(h) || [], run = ++restoreRun, t0 = Date.now();
+  let user = false;
+  const stop = () => { user = true; };
+  ["touchstart", "wheel", "keydown"].forEach(ev => addEventListener(ev, stop, { once: true, passive: true }));
+  const step = () => {
+    if (run !== restoreRun || user) return;
+    const ds = $$("#azMain details");
+    open.forEach(i => { if (ds[i] && !ds[i].open) ds[i].open = true; });
+    scrollTo(0, y);
+    const done = Math.abs(scrollY - y) < 2 && open.every(i => ds[i]);
+    if (!done && Date.now() - t0 < 2500) setTimeout(step, 60);
+  };
+  step();
+}
 function goBack() {
   if (NAV.length > 1) history.back();
   else location.replace("#home");
@@ -913,13 +935,14 @@ const SCREENS = {
     if (!c) return SCREENS.cities();
     const tab = CITY_TAB[c.id] || (c.counts.a ? "a" : "h");
     return `${backBtn()}
-      <div class="az-cover" ${c.img ? `data-cover="${esc(c.img)}"` : ""}><div>
+      <div class="az-cover" ${c.img ? `data-cover="${esc(c.img)}" tabindex="0" role="button" aria-label="${vt("zoom")}"` : ""}>${c.img ? `<span class="az-cover-zoom">${icon("maximize")}</span>` : ""}<div>
         <span class="tag">${c.t === "city" ? t("city") : t("town")}${c.pop ? " · " + popText(c.pop) : ""}</span>
         <h1>${esc(cityName(c))}</h1>${c.n.az && c.n.az !== cityName(c) ? `<p>${esc(c.n.az)}</p>` : ""}</div></div>
       <div class="az-facts"><span>${icon("dome")} ${c.counts.a} ${t("cat_a").toLowerCase()}</span><span>${icon("hotel")} ${c.counts.h} ${t("cat_h").toLowerCase()}</span><span>${icon("food")} ${c.counts.f} ${t("cat_f").toLowerCase()}</span><span id="cityWx"></span></div>
       <div class="az-btns two">${goBtn(c.lat, c.lon, cityName(c))}
         ${OFF_CITY[c.id] ? `<a class="az-btn ghost" href="${offPacks()[c.id] ? `#map/${c.id}` : "#offline"}">${icon("map-pinned")} ${t("map_offline_btn")}</a>` : `<a class="az-btn ghost" href="#map/@${c.id}">${icon("map")} ${t("nav_map")}</a>`}</div>
       ${planRow(c.id)}
+      ${panoBtn(c.lat, c.lon, cityName(c))}
       <div class="az-card az-story" id="cityStory" style="margin-top:14px"><p class="hint">…</p></div>
       <div class="az-chips" id="cityTabs">${["a", "h", "f", "s"].filter(k => c.counts[k]).map(k => `<button type="button" class="${k === tab ? "on" : ""}" data-city-tab="${k}">${icon(CAT_ICON[k])} ${t("cat_" + k)} (${c.counts[k]})</button>`).join("")}</div>
       <div class="list" id="cityList"></div>`;
@@ -940,13 +963,14 @@ const SCREENS = {
     if (!p) return SCREENS.places();
         const site = p.w ? (/^https?:/.test(p.w) ? p.w : "https://" + p.w.replace(/^@/, "instagram.com/")) : "";
     return `${backBtn()}
-      <div class="az-cover" style="background:var(--g-${p.c})" ${p.im ? `data-cover="${esc(p.im)}"` : ""}><div>
+      <div class="az-cover" style="background:var(--g-${p.c})" ${p.im ? `data-cover="${esc(p.im)}" tabindex="0" role="button" aria-label="${vt("zoom")}"` : ""}>${p.im ? `<span class="az-cover-zoom">${icon("maximize")}</span>` : ""}<div>
         <span class="tag">${typeLabel(p.s)}${p.st ? " · " + "★".repeat(p.st) : ""}</span>
         <h1>${esc(poiName(p))}</h1><p>${esc(cityName(p.city))}${p.n !== poiName(p) ? " · " + esc(p.n) : ""}</p></div></div>
       <div class="az-btns two">${goBtn(p.la, p.lo, poiName(p))}
         ${p.ph ? `<a class="az-btn ghost" href="tel:${esc(p.ph.replace(/[^\d+]/g, ""))}">${icon("phone")} ${t("call")}</a>` : p.c === "h" ? ext(bookingUrl(p), "search", "Booking", "ghost") : `<a class="az-btn ghost" href="#map/=${p.id}">${icon("map")} ${t("on_map")}</a>`}</div>
       <div class="az-btns two">${placeSaveBtn(p.la, p.lo, poiName(p), p.id)}<a class="az-btn ghost" href="${taxiHref(p.la, p.lo, poiName(p))}">${icon("car")} ${t("taxi_t")}</a></div>
       ${p.c === "h" ? `<div class="az-btns">${placeHomeBtn(p.la, p.lo, poiName(p), p.id)}</div>` : ""}
+      ${panoBtn(p.la, p.lo, poiName(p))}
       ${p.city ? planRow(p.city.id, true) : ""}
       ${(pr => pr ? `<div class="az-card az-price-card" style="margin-top:14px">${priceLine(pr)}</div>` : "")(poiPrice(p))}
       <div class="az-card" style="margin-top:14px">
@@ -1108,11 +1132,16 @@ const SCREENS = {
 let curHash = "";
 function route() {
   const h = location.hash && location.hash !== "#" ? location.hash : "#home";
-  if (curHash) SCROLL.set(curHash, scrollY);
+  if (curHash) {
+    SCROLL.set(curHash, scrollY);
+    OPENED.set(curHash, $$("#azMain details").map((d, i) => d.open ? i : -1).filter(i => i >= 0));
+  }
   const goingBack = NAV.length > 1 && NAV[NAV.length - 2] === h;
   if (goingBack) NAV.pop(); else if (NAV[NAV.length - 1] !== h) NAV.push(h);
   if (NAV.length > 40) NAV.splice(0, NAV.length - 40);
   curHash = h;
+  // новый переход на экран — списки с начала; «Назад» — сколько было открыто
+  if (!goingBack) for (const k of PAGED.keys()) if (k.startsWith(h + "|")) PAGED.delete(k);
   const [kind, id] = decodeURIComponent(h.slice(1)).split("/");
   chatStop();
   mapStop();
@@ -1121,9 +1150,10 @@ function route() {
   const fn = SCREENS[kind] || SCREENS.home;
   $("#azMain").innerHTML = fn(id);
   // Назад — на то же место, что было; новый экран — сверху
-  scrollTo(0, goingBack ? SCROLL.get(h) || 0 : 0);
+  scrollTo(0, 0);
   if (!goingBack) $("#azMain").focus({ preventScroll: true });
   startScreen(kind, id);
+  if (goingBack) restoreView(h); else restoreRun++;
 }
 addEventListener("hashchange", route);
 // Всё «живое» на экране (списки, карта, погода, чат) — после отрисовки; и при переходе, и при смене языка
@@ -1610,7 +1640,7 @@ function trMic(btn) {
 }
 
 // ---------- Без интернета: приложение (свой сервис-воркер az-sw.js) и города ----------
-const OFF_DATA = "safar-az-offline", OFF_SHELL = "safar-az-v33";   // OFF_SHELL — как V в az-sw.js
+const OFF_DATA = "safar-az-offline", OFF_SHELL = "safar-az-v34";   // OFF_SHELL — как V в az-sw.js
 const offPacks = () => store.get("az_offline", {});
 const offBusy = new Set();
 const offUrl = id => `/az-offline/city/${id}.json`;
