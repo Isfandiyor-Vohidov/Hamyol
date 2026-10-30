@@ -10,7 +10,7 @@ function giveConsent() {
 }
 
 // Плавно убрать элемент (класс .out → анимация закрытия) и удалить
-function consentRemove(el, ms = 260) {
+function consentRemove(el, ms = 160) {
   if (!el || el.classList.contains("out")) return;
   el.classList.add("out");
   setTimeout(() => el.remove(), matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : ms);
@@ -61,7 +61,8 @@ function requireConsent() {
     const dlg = $("#consentDlg");
     const done = ok => {
       if (ok) giveConsent();
-      consentRemove(dlg);
+      // «Принять» — действие продолжается сразу, поэтому окно убираем мгновенно, а не тёмной подложкой поверх
+      if (ok) dlg.remove(); else consentRemove(dlg, 160);
       consentWait = null;
       resolve(ok);
     };

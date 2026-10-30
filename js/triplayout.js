@@ -118,5 +118,25 @@ document.addEventListener("click", e => {
   if (w === "own") { const i = $("#routeCity"); i?.scrollIntoView({ behavior: "smooth", block: "center" }); return setTimeout(() => i?.focus(), 350); }
   // «По бюджету» и «Готовые маршруты» живут на главной — переходим и прокручиваем к блоку
   goTab("home");
-  setTimeout(() => $(w === "budget" ? "#quickTrip" : "#collectionsGrid")?.scrollIntoView({ behavior: "smooth", block: "start" }), 350);
+  scrollWhenHome(w === "budget" ? "#quickTrip" : "#collectionsGrid");
 });
+// Главная открывается не мгновенно (переход «назад» восстанавливает старую прокрутку уже после отрисовки) —
+// ждём, пока она откроется и блок появится, и только потом прокручиваем; на медленном телефоне — тоже
+function scrollWhenHome(sel) {
+  const t0 = Date.now();
+  const tick = () => {
+    const el = $(sel), home = /^#?(home)?$/.test(location.hash);
+    if (home && el && el.offsetParent && (sel !== "#collectionsGrid" || el.children.length)) {
+      // после восстановления прокрутки (route ставит её ещё раз через кадр) — плавно к блоку
+      // к заголовку блока, а не под шапку сайта
+      const box = el.closest("section") || el, head = document.querySelector("header")?.offsetHeight || 0;
+      const y = () => box.getBoundingClientRect().top + scrollY - head - 8;
+      return setTimeout(() => {
+        scrollTo({ top: y(), behavior: "smooth" });
+        setTimeout(() => { if (Math.abs(y() - scrollY) > 120) scrollTo({ top: y() }); }, 700);
+      }, 120);
+    }
+    if (Date.now() - t0 < 4000) setTimeout(tick, 80);
+  };
+  setTimeout(tick, 60);
+}

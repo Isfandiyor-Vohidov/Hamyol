@@ -2136,7 +2136,7 @@ html.big .hint, html.big small { font-weight: 600; }
   display: grid; grid-template-columns: auto 1fr; gap: 10px 12px; align-items: center; padding: 14px 40px 14px 14px; overflow: hidden;
   background: var(--card); color: var(--text); border: 1px solid var(--line); border-radius: 18px; box-shadow: var(--shadow-lg);
   animation: csBarIn .45s var(--ease); }
-.consent-bar.out { animation: csBarOut .26s ease forwards; pointer-events: none; }
+.consent-bar.out { animation: csBarOut .16s ease forwards; pointer-events: none; }
 @keyframes csBarIn { from { opacity: 0; transform: translateY(24px) scale(.97); } }
 @keyframes csBarOut { to { opacity: 0; transform: translateY(24px) scale(.97); } }
 .consent-ic { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; background: var(--tint-gold); color: var(--gold-ink); }
@@ -2153,8 +2153,8 @@ html.big .hint, html.big small { font-weight: 600; }
 @media (min-width: 1001px) { .consent-bar { bottom: 20px; } }
 
 .consent-dlg { position: fixed; inset: 0; z-index: 1300; display: grid; place-items: center; padding: 16px; background: rgba(10,14,20,.55); animation: csFade .25s ease; }
-.consent-dlg.out { animation: csFadeOut .24s ease forwards; pointer-events: none; }
-.consent-dlg.out .consent-card { animation: csCardOut .24s ease forwards; }
+.consent-dlg.out { animation: csFadeOut .16s ease forwards; pointer-events: none; }
+.consent-dlg.out .consent-card { animation: csCardOut .16s ease forwards; }
 @keyframes csFade { from { opacity: 0; } }
 @keyframes csFadeOut { to { opacity: 0; } }
 .consent-card { width: min(420px, 100%); max-height: calc(100dvh - 32px); overflow: auto; background: var(--card); color: var(--text); border-radius: 24px; padding: 26px 22px 18px; text-align: center;
