@@ -310,7 +310,10 @@ npm start
 | `BOOKING_AID` | Партнёрский ID Booking.com. Добавляется в ссылки «Проверить цену» |
 | `ESIM_URL`, `INSURANCE_URL` | Партнёрские ссылки (https) на eSIM и страховку. Пусто — кнопок нет |
 | `OPERATOR`, `CONTACT` | Кто обрабатывает персональные данные и как с ним связаться. Показываются в политике конфиденциальности |
+| `TUNNEL` | `ngrok` (по умолчанию) или `cloudflare` — чем `scripts/run.mjs` открывает сервер в интернет. `start-cloudflare.bat` включает Cloudflare и без этой строки |
 | `NGROK_DOMAIN` | Постоянный адрес ngrok для `start.bat` (например, `safar.ngrok-free.app`) |
+| `CF_TUNNEL_TOKEN`, `CF_HOSTNAME` | Постоянный адрес через Cloudflare: токен туннеля (Cloudflare Zero Trust → Networks → Tunnels, нужен свой домен в Cloudflare) и этот домен. Без них — быстрый туннель `*.trycloudflare.com` |
+| `CLOUDFLARED` | Путь к `cloudflared.exe`, если его нет в PATH и в обычных папках установки |
 | `TRUST_PROXY` | `1`, если сервер стоит за nginx или Cloudflare |
 | `AZ_MS_KEY`, `AZ_MS_REGION` | Точный онлайн-перевод на азербайджанский — Microsoft Translator F0 (бесплатно 2 млн символов в месяц) |
 | `AZ_GOOGLE_KEY` | Или Google Cloud Translation (500 тыс. символов в месяц). Без ключей — MyMemory и офлайн-модели |
@@ -319,9 +322,15 @@ npm start
 
 ## Запуск на своём компьютере без хостинга
 
-1. Двойной щелчок по `start.bat`. Он поднимает туннель ngrok и сервер, перезапускает их при падении и пишет журналы в `storage/logs`.
+1. Двойной щелчок по `start.bat` (ngrok) или `start-cloudflare.bat` (Cloudflare). Он поднимает туннель и сервер, перезапускает их при падении и пишет журналы в `storage/logs`.
 2. Чтобы Safar запускался сам при входе в Windows, один раз запустите `autostart.bat`. Выключить: `autostart.bat off`.
 3. Задайте в `.env` постоянный адрес `NGROK_DOMAIN` (бесплатно: кабинет ngrok → Domains). Тогда адрес не меняется после перезапуска, и APK не нужно пересобирать.
+
+**Если у ngrok кончился трафик** (бесплатно — 1 ГБ в месяц; одно первое открытие Hamyol Азербайджан с автоскачиванием переводчика, перевода по фото и карты — около 170 МБ), используйте Cloudflare Tunnel — он бесплатный и без лимита трафика:
+
+1. Один раз установите cloudflared: `winget install --id Cloudflare.cloudflared`.
+2. Двойной щелчок по `start-cloudflare.bat` (или `TUNNEL=cloudflare` в `.env` и обычный `start.bat`). Адрес появится в окне и в `storage/logs/last-url.txt`.
+3. Быстрый туннель даёт адрес `https://….trycloudflare.com`, новый при каждом запуске: сервер сам получает его как `PUBLIC_URL` (бот, ссылки), но вход через Google (Authorized JavaScript origins) и APK привязаны к адресу. Для постоянного адреса нужен свой домен в Cloudflare: создайте туннель в Zero Trust → Networks → Tunnels, направьте его на `http://localhost:<PORT>` и впишите `CF_TUNNEL_TOKEN` и `CF_HOSTNAME` в `.env`.
 
 Компьютер при этом должен быть включён и не уходить в сон.
 
