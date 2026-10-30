@@ -539,6 +539,7 @@ function cityCard(c) {
         <h3>${esc(cityName(c))}</h3>
         ${c.n.az && c.n.az !== cityName(c) ? `<div class="sub">${esc(c.n.az)}</div>` : ""}
         <div class="meta"><span title="${t("cat_a")}">${icon("dome")} ${c.counts.a}</span> <span title="${t("cat_h")}">${icon("hotel")} ${c.counts.h}</span> <span title="${t("cat_f")}">${icon("food")} ${c.counts.f}</span></div>
+        <div class="card-plan">${planBtn(c.id, "ghost", true)}</div>
       </div>
     </div>`;
 }
@@ -918,7 +919,7 @@ const SCREENS = {
       <div class="az-facts"><span>${icon("dome")} ${c.counts.a} ${t("cat_a").toLowerCase()}</span><span>${icon("hotel")} ${c.counts.h} ${t("cat_h").toLowerCase()}</span><span>${icon("food")} ${c.counts.f} ${t("cat_f").toLowerCase()}</span><span id="cityWx"></span></div>
       <div class="az-btns two">${goBtn(c.lat, c.lon, cityName(c))}
         ${OFF_CITY[c.id] ? `<a class="az-btn ghost" href="${offPacks()[c.id] ? `#map/${c.id}` : "#offline"}">${icon("map-pinned")} ${t("map_offline_btn")}</a>` : `<a class="az-btn ghost" href="#map/@${c.id}">${icon("map")} ${t("nav_map")}</a>`}</div>
-      <a class="az-row plan-cta" href="#plan/${c.id}">${icon("sparkles")}<div><b>${pl("btn")}</b><small>${pl("btn_sub")}</small></div>${icon("chevron-right", "go")}</a>
+      ${planRow(c.id)}
       <div class="az-card az-story" id="cityStory" style="margin-top:14px"><p class="hint">…</p></div>
       <div class="az-chips" id="cityTabs">${["a", "h", "f", "s"].filter(k => c.counts[k]).map(k => `<button type="button" class="${k === tab ? "on" : ""}" data-city-tab="${k}">${icon(CAT_ICON[k])} ${t("cat_" + k)} (${c.counts[k]})</button>`).join("")}</div>
       <div class="list" id="cityList"></div>`;
@@ -946,6 +947,7 @@ const SCREENS = {
         ${p.ph ? `<a class="az-btn ghost" href="tel:${esc(p.ph.replace(/[^\d+]/g, ""))}">${icon("phone")} ${t("call")}</a>` : p.c === "h" ? ext(bookingUrl(p), "search", "Booking", "ghost") : `<a class="az-btn ghost" href="#map/=${p.id}">${icon("map")} ${t("on_map")}</a>`}</div>
       <div class="az-btns two">${placeSaveBtn(p.la, p.lo, poiName(p), p.id)}<a class="az-btn ghost" href="${taxiHref(p.la, p.lo, poiName(p))}">${icon("car")} ${t("taxi_t")}</a></div>
       ${p.c === "h" ? `<div class="az-btns">${placeHomeBtn(p.la, p.lo, poiName(p), p.id)}</div>` : ""}
+      ${p.city ? planRow(p.city.id, true) : ""}
       ${(pr => pr ? `<div class="az-card az-price-card" style="margin-top:14px">${priceLine(pr)}</div>` : "")(poiPrice(p))}
       <div class="az-card" style="margin-top:14px">
         ${[p.ad && [icon("pin"), esc(p.ad)], p.oh && [icon("clock"), esc(p.oh)], p.ph && [icon("phone"), `<a href="tel:${esc(p.ph.replace(/[^\d+]/g, ""))}">${esc(p.ph)}</a>`],
@@ -1608,7 +1610,7 @@ function trMic(btn) {
 }
 
 // ---------- Без интернета: приложение (свой сервис-воркер az-sw.js) и города ----------
-const OFF_DATA = "safar-az-offline", OFF_SHELL = "safar-az-v32";   // OFF_SHELL — как V в az-sw.js
+const OFF_DATA = "safar-az-offline", OFF_SHELL = "safar-az-v33";   // OFF_SHELL — как V в az-sw.js
 const offPacks = () => store.get("az_offline", {});
 const offBusy = new Set();
 const offUrl = id => `/az-offline/city/${id}.json`;
@@ -1637,6 +1639,7 @@ function offCityHtml(c) {
     <div class="az-btns ${pk ? "two" : ""}">${busy ? `<button type="button" class="az-btn" disabled>${t("off_busy")}</button>`
       : pk ? `<a class="az-btn" href="#map/${c.id}">${icon("map-pinned")} ${t("off_open")}</a><button type="button" class="az-btn ghost" data-off-more="${c.id}">${icon("more")}</button>`
       : `<button type="button" class="az-btn" data-off-dl="${c.id}">${icon("download")} ${t("off_dl")}</button>`}</div>
+    <div class="az-btns">${planBtn(c.id)}</div>
     ${pk ? `<div class="az-btns two" id="offMore-${c.id}" hidden><button type="button" class="az-btn ghost" data-off-dl="${c.id}">${icon("refresh")} ${t("off_update")}</button><button type="button" class="az-btn red" data-off-del="${c.id}">${icon("ban")} ${t("off_del")}</button></div>` : ""}
   </div>`;
 }

@@ -433,3 +433,25 @@ html:not(.simple) .only-simple { display: none !important; }
 .plan-why p { margin: 4px 0; }
 .plan-why small { color: var(--muted); }
 .plan-eco { margin: 10px 0 0; padding: 10px 12px; border-radius: 12px; background: rgba(230, 180, 80, .14); font-weight: 600; }
+
+/* План везде: кнопки и раскрывающиеся разделы цен */
+.card-plan { padding-top: 10px; }
+.card-plan .az-btn { width: 100%; padding: 8px 10px; font-size: .9rem; min-height: 0; }
+.plan-btn.has, .plan-cta.has { border-color: var(--green, #1f9d5c); }
+.plan-btn.has { color: var(--green-ink); }
+.plan-cta.has > .i:first-child { color: var(--green-ink); }
+.plan-edit { margin-bottom: 12px; }
+.plan-edit > summary { list-style: none; width: 100%; cursor: pointer; }
+.plan-edit > summary::-webkit-details-marker { display: none; }
+.plan-edit[open] > summary { margin-bottom: 10px; }
+.plan-cat { border-bottom: 1px solid var(--line); }
+.plan-cat:last-child { border-bottom: 0; }
+.plan-cat > summary { list-style: none; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+.plan-cat > summary::-webkit-details-marker { display: none; }
+.plan-cat > summary .plan-bar { flex: 1; }
+.plan-cat > summary .plan-bar small { color: var(--muted); font-weight: 500; }
+.plan-cat > summary::after { content: "›"; transform: rotate(90deg); color: var(--muted); font-size: 1.4rem; line-height: 1; }
+.plan-cat[open] > summary::after { transform: rotate(-90deg); }
+.plan-cat-in { padding: 0 0 8px 10px; border-left: 3px solid var(--green); margin-bottom: 8px; }
+.plan-line summary::after, .plan-cat > summary::after { content: "▾"; transform: none; font-size: 1.1rem; }
+.plan-line[open] summary::after, .plan-cat[open] > summary::after { content: "▴"; transform: none; }

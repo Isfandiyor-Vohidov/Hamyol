@@ -43,6 +43,7 @@ function simpleHome() {
       ${big("#where/taxi", "car", "taxi", "t-taxi")}${big("#sos", "siren", "sos", "t-sos")}
     </div>
     ${home ? `<a class="sm-hotel" href="${goHref(home.la, home.lo, home.n)}">${icon("home")}<span><b>${sm("back_hotel")}</b><small>${esc(home.n)}</small></span>${icon("chevron-right", "go")}</a>` : ""}
+    ${(c => c ? planRow(c.id, true) : "")(planCities()[0])}
     <p class="sm-status" id="smStatus"></p>
     <a class="sm-more" href="#more">${icon("grid")} ${sm("more_all")}</a>
   </div>`;
@@ -82,7 +83,7 @@ function whereList(q) {
     : POIS.filter(p => p.c === "a" && (!USER_POS || near(p) < 30)).sort((a, b) => fame(b) - fame(a)).slice(0, 12);
   const cities = s.length >= 2 ? smartFind(CITIES, s, 5, byPop) : [];
   if (cities.length || pois.length) html += `<h2 class="az-h2">${icon(s ? "search" : "star")} ${s ? sm("found") : sm("popular")}</h2>`;
-  html += cities.map(c => row(c.lat, c.lon, cityName(c), LL("город", "city"), "city", "#24508f")).join("");
+  html += cities.map(c => row(c.lat, c.lon, cityName(c), LL("город", "city"), "city", "#24508f") + planRow(c.id, true)).join("");
   html += pois.map(p => row(p.la, p.lo, poiName(p), `${typeLabel(p.s)} · ${cityName(p.city)}${USER_POS ? " · " + fmtDist(near(p)) : ""}`, poiIcon(p), CAT_COLOR[p.c])).join("");
   box.innerHTML = html || `<p class="az-empty">${sm("nothing")}</p>`;
 }
@@ -92,7 +93,8 @@ document.addEventListener("input", e => { if (e.target.id === "whereQ") whereLis
 function moreScreen() {
   const r = (href, ic, k) => row(href, ic, sm(k), "");
   return `${head("grid", sm("more"))}
-    ${row("#plan/baku", "sparkles", pl("btn"), pl("btn_sub"))}
+    ${planCities().slice(0, 3).map(c => planRow(c.id, true)).join("")}
+    ${row("#plan", "sparkles", pl("btn"), pl("btn_sub"))}
     ${r("#map", "map", "m_map")}${r("#places", "dome", "m_places")}${r("#cities", "city", "m_cities")}${r("#buses", "bus", "m_buses")}
     ${row("#mine", "star", sm("mine"), "")}${r("#chat", "message", "m_chat")}${r("#pay", "credit-card", "m_pay")}${r("#trips", "route", "m_trips")}
     ${r("#offline", "download", "m_off")}${r("#account", "user", "m_acc")}

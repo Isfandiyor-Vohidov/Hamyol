@@ -18,7 +18,11 @@ const PLAN_TX = {
   est: ["примерная цена", "approximate price"], checked: ["цена проверена ({d})", "price checked ({d})"],
   again: ["Изменить и пересчитать", "Change and recalculate"], save_note: ["План сохранён на телефоне — открывается и без интернета.", "The plan is saved on the phone — it opens offline too."],
   route_day: ["Маршрут на этот день", "Route for this day"], tips_over: ["Как уложиться в бюджет", "How to fit the budget"], tips_left: ["Что можно добавить", "What you could add"],
-  need: ["Заполните дни, деньги и количество человек", "Fill in days, money and number of people"]
+  need: ["Заполните дни, деньги и количество человек", "Fill in days, money and number of people"],
+  open: ["Перейти к своему плану", "Go to my plan"], btn_s: ["План поездки", "Trip plan"], open_s: ["Мой план", "My plan"], open_sub: ["{days} дн. · {people} чел. · {money}", "{days} days · {people} people · {money}"],
+  edit: ["Изменить план (дни, деньги, люди)", "Change the plan (days, money, people)"], mine: ["Мои планы", "My plans"],
+  pick: ["Выберите город", "Choose a city"], pick_q: ["Город: Баку, Шеки, Габала…", "City: Baku, Sheki, Gabala…"], for_city: ["План поездки: {c}", "Trip plan: {c}"],
+  tap_cat: ["Нажмите на раздел — откроются все цены", "Tap a section to see every price"]
 };
 const pl = (k, v = {}) => { let s = PLAN_TX[k][LANG === "en" ? 1 : 0]; for (const x in v) s = s.replaceAll("{" + x + "}", v[x]); return s; };
 const mid = pr => pr ? (pr.lo + pr.hi) / 2 : 0;
@@ -27,19 +31,53 @@ const r2 = v => Math.round(v * 100) / 100;
 const planRate = cur => cur === "AZN" ? 1 : store.get("az_rates", null)?.rates?.[cur] || { UZS: 6900, USD: 0.588, RUB: 47, EUR: 0.54 }[cur] || 1;
 const SIGHT_MIN = { museum: 90, gallery: 60, castle: 60, fort: 60, theme_park: 150, zoo: 120, viewpoint: 25, monument: 20, city_gate: 15, building: 30, tomb: 30, ruins: 45, archaeological_site: 60, minaret: 20, attraction: 60 };
 
+const planSaved = id => store.get("az_plan_" + id, null);
+const planMoney = f => f.cur === "AZN" ? fmtAzn(f.money, f.money) : fmtNum(f.money) + " " + (f.cur === "UZS" ? LL("сум", "so‘m") : f.cur);
+// Маленькая кнопка (карточки городов, «Без интернета»)
+function planBtn(id, cls = "ghost", short = false) {
+  const has = !!planSaved(id);
+  return `<a class="az-btn ${cls} plan-btn${has ? " has" : ""}" href="#plan/${id}">${icon(has ? "route" : "sparkles")} ${has ? pl(short ? "open_s" : "open") : pl(short ? "btn_s" : "btn")}</a>`;
+}
+// Большая строка (страница города и места, «Ещё», поиск); name — подписать город
+function planRow(id, name = false) {
+  const c = CITY[id], f = planSaved(id)?.input;
+  if (!c) return "";
+  const title = f ? pl("open") : name ? pl("for_city", { c: esc(cityName(c)) }) : pl("btn");
+  const sub = f ? (name ? esc(cityName(c)) + " · " : "") + pl("open_sub", { days: f.days, people: f.people, money: planMoney(f) }) : pl("btn_sub");
+  return `<a class="az-row plan-cta${f ? " has" : ""}" href="#plan/${c.id}">${icon(f ? "route" : "sparkles")}<div><b>${title}</b><small>${sub}</small></div>${icon("chevron-right", "go")}</a>`;
+}
+const planCities = () => CITIES.filter(c => planSaved(c.id)).sort((a, b) => planSaved(b.id).at - planSaved(a.id).at);
+// #plan без города: свои планы и выбор города (с умным поиском)
+function planPick() {
+  const mine = planCities();
+  setTimeout(() => planPickList(""), 0);
+  return `${head("route", pl("title"), pl("lead"))}
+    ${mine.length ? `<h2 class="az-h2">${icon("star")} ${pl("mine")}</h2>${mine.map(c => planRow(c.id, true)).join("")}` : ""}
+    <h2 class="az-h2">${icon("city")} ${pl("pick")}</h2>
+    <input class="az-input" id="planQ" type="search" placeholder="${pl("pick_q")}" autocomplete="off">
+    <div id="planPick"></div>`;
+}
+function planPickList(q) {
+  const box = $("#planPick");
+  if (box) box.innerHTML = (q.trim() ? smartFind(CITIES, q, 12, byPop) : POPULAR).map(c => planRow(c.id, true)).join("");
+}
+document.addEventListener("input", e => { if (e.target.id === "planQ") planPickList(e.target.value); });
+
 function planScreen(id) {
-  const c = CITY[id] || BAKU;
+  if (!id || !CITY[id]) return planPick();
+  const c = CITY[id];
   const last = store.get("az_plan_" + c.id, null);
   setTimeout(() => { if (last) planShow(c, last); }, 30);
   const f = last?.input || { days: 3, money: 600, cur: "AZN", people: 2 };
   return `${head("route", `${pl("title")}: ${esc(cityName(c))}`, pl("lead"))}
+    ${last ? `<details class="plan-edit" id="planEdit"><summary class="az-btn ghost">${icon("edit")} ${pl("edit")}</summary>` : ""}
     <form class="az-card plan-form" id="planForm" data-city="${c.id}">
       <label>${icon("calendar")} <span>${pl("days")}</span><input class="az-input" name="days" type="number" inputmode="numeric" min="1" max="14" value="${f.days}" required></label>
       <label>${icon("wallet")} <span>${pl("money")}</span><span class="plan-money"><input class="az-input" name="money" type="number" inputmode="decimal" min="1" value="${f.money}" required>
         <select class="az-select" name="cur">${["AZN", "UZS", "USD", "RUB", "EUR"].map(k => `<option value="${k}" ${k === f.cur ? "selected" : ""}>${k === "AZN" ? "₼ манат" : k === "UZS" ? "сум" : k}</option>`).join("")}</select></span></label>
       <label>${icon("users")} <span>${pl("people")}</span><input class="az-input" name="people" type="number" inputmode="numeric" min="1" max="12" value="${f.people}" required></label>
       <button class="az-btn" type="submit">${icon("sparkles")} ${pl("build")}</button>
-    </form>
+    </form>${last ? "</details>" : ""}
     <div id="planOut"></div>`;
 }
 document.addEventListener("submit", async e => {
@@ -144,7 +182,7 @@ async function planBuild(c, input, lvl = 0, shareSet = 0) {
   // 5. Прочее: вода и мелочи, связь, запас 10%
   add({ cat: "other", title: LL("Вода, перекусы, мелочи", "Water, snacks, small things"), where: LL("магазины и киоски", "shops and kiosks"), lo: 2 * people * days, hi: 5 * people * days, est: true,
     how: LL(`2–5 ₼ на человека в день × ${people} × ${days}`, `2–5 ₼ per person per day × ${people} × ${days}`), why: LL("Вода (0,50–1 ₼), чай, мороженое, сувенир-мелочь — набегает каждый день.", "Water (0.50–1 ₼), tea, ice cream, small souvenirs — adds up daily.") });
-  add({ cat: "other", title: LL("Мобильный интернет", "Mobile internet"), where: LL("SIM-карта Azercell / Bakcell (в аэропорту или салоне связи, нужен паспорт)", "Azercell / Bakcell SIM (airport or shop, passport needed)"), lo: 8, hi: 15 * Math.ceil(people / 2), est: true,
+  add({ cat: "other", title: LL("Мобильный интернет", "Mobile internet"), where: c === BAKU ? LL("SIM-карта Azercell / Bakcell (в аэропорту или салоне связи, нужен паспорт)", "Azercell / Bakcell SIM (airport or shop, passport needed)") : LL("SIM-карта Azercell / Bakcell (в салоне связи, нужен паспорт)", "Azercell / Bakcell SIM (phone shop, passport needed)"), lo: 8, hi: 15 * Math.ceil(people / 2), est: true,
     how: LL("туристический пакет 8–15 ₼, можно одну на двоих и раздавать интернет", "tourist pack 8–15 ₼, one can be shared via hotspot"), why: LL("Нужен для карт, такси и онлайн-перевода; переводчик и карты Hamyol работают и без него.", "For maps, taxis and online translation; Hamyol's translator and maps also work offline.") });
   const sub = lines.reduce((s, l) => [s[0] + l.lo, s[1] + l.hi], [0, 0]);
   add({ cat: "other", title: LL("Запас на непредвиденное (10%)", "Reserve for the unexpected (10%)"), where: "—", lo: sub[0] * 0.1, hi: sub[1] * 0.1, est: true,
@@ -223,7 +261,9 @@ function planShow(c, plan) {
       <p class="hint" style="margin:8px 0 0">${input.days} ${LL("дн.", "days")} · ${input.people} ${LL("чел.", "people")} · ${plan.nights} ${LL("ноч.", "nights")} · ${plan.rooms} ${LL("номер(а)", "room(s)")}</p>
     </div>
     <h2 class="az-h2">${icon("wallet")} ${pl("by_cat")}</h2>
-    <div class="az-card">${byCat.map(([k, v]) => `<div class="plan-bar"><span>${pl("c_" + k)}</span><b>${fmtAzn(Math.round(v), Math.round(v))} · ${Math.round(v / avg * 100)}%</b><i style="width:${Math.max(3, v / avg * 100)}%"></i></div>`).join("")}</div>
+    <p class="hint" style="margin:-4px 0 8px">${pl("tap_cat")}</p>
+    <div class="az-card">${byCat.map(([k, v]) => { const cl = lines.filter(l => l.cat === k); return `<details class="plan-cat"><summary><div class="plan-bar"><span>${pl("c_" + k)} <small>(${cl.length})</small></span><b>${fmtAzn(Math.round(v), Math.round(v))} · ${Math.round(v / avg * 100)}%</b><i style="width:${Math.max(3, v / avg * 100)}%"></i></div></summary>
+      <div class="plan-cat-in">${cl.map(line).join("")}</div></details>`; }).join("")}</div>
     <h2 class="az-h2">${icon("lightbulb")} ${ok ? pl("tips_left") : pl("tips_over")}</h2>
     <div class="az-card"><ul class="az-list">${tips.map(x => `<li>${esc(x)}</li>`).join("")}</ul></div>
     <h2 class="az-h2">${icon("hotel")} ${pl("c_hotel")}</h2>
@@ -235,4 +275,9 @@ function planShow(c, plan) {
     <p class="hint">${icon("check")} ${pl("save_note")}</p>
     <div class="az-btns"><button type="button" class="az-btn ghost" data-plan-top>${icon("edit")} ${pl("again")}</button></div>`;
 }
-document.addEventListener("click", e => { if (e.target.closest("[data-plan-top]")) $("#planForm")?.scrollIntoView({ behavior: "smooth" }); });
+document.addEventListener("click", e => {
+  if (!e.target.closest("[data-plan-top]")) return;
+  const d = $("#planEdit");
+  if (d) d.open = true;
+  (d || $("#planForm"))?.scrollIntoView({ behavior: "smooth" });
+});
